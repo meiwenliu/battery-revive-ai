@@ -248,28 +248,20 @@ document.addEventListener('DOMContentLoaded', () => {
       if (document.getElementById('inputNomCap')) document.getElementById('inputNomCap').value = spec.nominal_cap_ah;
       if (document.getElementById('inputQDis')) document.getElementById('inputQDis').value = spec.default_q_dis_ah;
       if (document.getElementById('inputEfMfg')) document.getElementById('inputEfMfg').value = spec.ef_mfg;
-      if (document.getElementById('inputCellId')) document.getElementById('inputCellId').value = `${spec.shortName}-2026-REC-01`;
+      if (document.getElementById('inputCellId')) document.getElementById('inputCellId').value = `${spec.shortName}-待测电芯`;
 
-      const p = spec.default_physics;
-      if (p) {
-        if (document.getElementById('inputU0')) document.getElementById('inputU0').value = p.u0;
-        if (document.getElementById('inputRdcDis')) document.getElementById('inputRdcDis').value = p.rdc_dis;
-        if (document.getElementById('inputRdcChg')) document.getElementById('inputRdcChg').value = p.rdc_chg;
-        if (document.getElementById('inputDrdc')) document.getElementById('inputDrdc').value = p.drdc;
-        if (document.getElementById('inputEta')) document.getElementById('inputEta').value = p.eta;
-        if (document.getElementById('inputAsym')) document.getElementById('inputAsym').value = p.asym;
-        if (document.getElementById('inputRelax')) document.getElementById('inputRelax').value = p.relax;
-        if (document.getElementById('inputSOC')) document.getElementById('inputSOC').value = p.soc;
-        if (document.getElementById('inputCE')) document.getElementById('inputCE').value = p.ce;
-        if (document.getElementById('inputEE')) document.getElementById('inputEE').value = p.ee;
-      }
+      // 8 项特征输入框彻底置空，表明尚未采集真实测量时序
+      ['inputU0', 'inputRdcDis', 'inputRdcChg', 'inputDrdc', 'inputEta', 'inputAsym', 'inputRelax', 'inputSOC', 'inputCE', 'inputEE'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
     }
 
-    // 状态徽标联动
+    // 状态徽标联动：明确显示待测
     const statusBadge = document.getElementById('chemStatusBadge');
     if (statusBadge) {
-      statusBadge.textContent = spec.statusText;
-      statusBadge.style.color = spec.statusColor;
+      statusBadge.textContent = '待测状态 (未接入实测数据)';
+      statusBadge.style.color = 'var(--color-amber)';
     }
 
     // 批量分选矩阵随体系自适应
@@ -652,16 +644,15 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // 9. 全流程计算与视图更新 (实现各模块随前序体系与参数的全动态联动)
-  window.runFullEvaluation = function(isExplicit = false) {
+  window.runFullEvaluation = function(isUserClick = false) {
     const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';
     const spec = CalculationEngine.CHEMISTRY_SPECS[chemKey] || CalculationEngine.CHEMISTRY_SPECS.lfp;
 
-    if (isExplicit) {
-      isMeasurementDataLoaded = true;
-    }
-
     if (!isMeasurementDataLoaded) {
       renderUnmeasuredState(chemKey);
+      if (isUserClick) {
+        alert(`【无法开展智能诊断】\n\n当前尚未接入【${spec.name}】的真实测量脉冲时序（无测试仪 CSV 文件）！\n\n系统严格恪守科研计量与商业公信力规范：在缺乏真实物理测量输入时，严禁凭空输出 SOH 与预测容量。\n\n请通过以下方式接入数据：\n1. 点击左上方【标定电芯库】选择国家台架实测标定电芯；\n2. 点击【📂 导入测试仪 CSV】上传真实采样时序文件；\n3. 或在示波器界面进行实时硬件通道采样。`);
+      }
       return;
     }
 
