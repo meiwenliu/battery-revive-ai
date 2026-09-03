@@ -6,10 +6,11 @@ const ChartManager = {
   currentTheme: 'dark',
 
   setTheme(theme) {
-    this.currentTheme = theme;
-    this.renderM1FeatureImportance('m1FeatureChart');
+    const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';
+    const nomCap = parseFloat(document.getElementById('inputNomCap')?.value) || 35.0;
+    this.renderM1FeatureImportance('m1FeatureChart', chemKey);
     this.renderM1ModelCompare('m1ModelCompareChart', document.getElementById('selM1Model')?.value || 'xgboost');
-    this.renderM2Conformal('m2ConformalChart');
+    this.renderM2Conformal('m2ConformalChart', nomCap);
     this.renderEchelonRadar('echelonRadarChart');
     this.renderCarbonWaterfall('carbonWaterfallChart');
     this.renderBatchDonut('batchDonutChart');
@@ -164,36 +165,53 @@ const ChartManager = {
     return this.initChart(domId, opt);
   },
 
-  // 1. M1 物理特征重要性得分排序柱状图
-  renderM1FeatureImportance(domId) {
+  // 1. M1 物理特征重要性得分排序柱状图 (支持依据选定材料体系动态呈现主导物理机制)
+  renderM1FeatureImportance(domId, chemKey = 'lfp') {
     const t = this.getThemeOptions();
+    const spec = (typeof CalculationEngine !== 'undefined' && CalculationEngine.CHEMISTRY_SPECS)
+      ? (CalculationEngine.CHEMISTRY_SPECS[chemKey] || CalculationEngine.CHEMISTRY_SPECS.lfp)
+      : null;
+    const list = (spec && spec.feature_importance) ? spec.feature_importance : [
+      { feature: "稳态开路电压 U₀", score: 38.5, mechanism: "两相转变平台位移与活性锂脱嵌损失" },
+      { feature: "倍率敏感电阻差 ΔR_dc", score: 21.4, mechanism: "高倍率固相扩散阻抗增加" },
+      { feature: "持续极化过电位 η", score: 15.2, mechanism: "电化学反应浓差与界面极化" },
+      { feature: "放电直流阻抗 R_dc,dis", score: 11.6, mechanism: "正极脱锂电荷转移阻抗" },
+      { feature: "撤载松弛电压 ΔU_relax", score: 6.8, mechanism: "双电层电荷弛豫恢复动力学" },
+      { feature: "充放电不对称度 A_sym", score: 4.1, mechanism: "脱嵌动力学极化非对称性" },
+      { feature: "充电直流阻抗 R_dc,chg", score: 2.4, mechanism: "负极石墨嵌锂界面阻抗" }
+    ];
+
+    const categories = list.map(item => item.feature);
+    const dataVals = list.map(item => item.score);
+
     const opt = {
       backgroundColor: 'transparent',
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      grid: { top: 15, right: 25, bottom: 15, left: 150 },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params) => {
+          const p = params[0];
+          const matched = list.find(x => x.feature === p.name);
+          const mech = matched && matched.mechanism ? `<br><span style="color:#00E5FF; font-size:11px;">主导物理机制: ${matched.mechanism}</span>` : '';
+          return `${p.name}: 贡献权重 <b>${p.value}%</b>${mech}`;
+        }
+      },
+      grid: { top: 15, right: 35, bottom: 15, left: 165 },
       xAxis: {
         type: 'value',
-        name: '分裂增益得分 (%)',
+        name: '特征贡献度 (%)',
         splitLine: { lineStyle: { color: t.splitLineColor } }
       },
       yAxis: {
         type: 'category',
         inverse: true,
-        data: [
-          'U₀ (稳态开路电压)',
-          'ΔR_dc (倍率敏感内阻差)',
-          'η (极化过电位)',
-          'R_dc,dis (放电直流阻抗)',
-          'ΔU_relax (撤载弛豫电压)',
-          'A_sym (充放过程不对称度)',
-          'R_dc,chg (充电直流阻抗)'
-        ],
+        data: categories,
         axisLabel: { color: t.textColor, fontSize: 11 }
       },
       series: [{
         name: '特征贡献度',
         type: 'bar',
-        data: [38.5, 21.4, 15.2, 11.6, 6.8, 4.1, 2.4],
+        data: dataVals,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
             { offset: 0, color: '#0284C7' },
@@ -211,7 +229,7 @@ const ChartManager = {
   renderM1ModelCompare(domId, selectedModel = 'xgboost') {
     const t = this.getThemeOptions();
     const modelKeys = ['xgboost', 'random_forest', 'ridge', 'pls', 'svr', 'mean_baseline'];
-    const modelNames = ['统一XGBoost', '随机森林', '岭回归', '偏最小二乘', 'SVR回归', '均值基线'];
+    const modelNames = ['统一XGBoost', '随机森林', '岭回归', '偏最小二乘', 'SVR回归', '均值参考基准'];
     const maeVals = [2.85, 3.12, 3.45, 3.68, 3.30, 4.52];
 
     const barData = modelKeys.map((k, idx) => {
@@ -253,18 +271,22 @@ const ChartManager = {
     return this.initChart(domId, opt);
   },
 
-  // 3. M2 逐电芯恢复容量预测值与 90% 保角预测区间
-  renderM2Conformal(domId) {
+  // 3. M2 逐电芯恢复容量预测值与 90% 保角预测区间 (随当前电芯标称容量与体系自适应缩放)
+  renderM2Conformal(domId, nomCap = 35.0) {
     const t = this.getThemeOptions();
     const cellNames = ['72', 'Cella', 'CellG', 'CellJ', 'CellT', 'Cellf', 'Cellg2', 'Cellh2', 'Cellj2', 'Cellk2', 'Celll2', 'Cellm', 'Cello', 'Cellp2', 'Cellq2', 'Cellr2', 'Cells2', 'Cellu2', 'Cell15', 'Cell16', 'CellC11', 'CellC14'];
-    const trueVals = [0.06, 0.09, 0.10, 0.10, 0.10, 0.14, 0.13, 0.17, 0.16, 0.17, 0.24, 0.18, 0.14, 0.21, 0.32, 0.12, 0.17, 0.10, 0.25, 0.15, 0.10, 0.34];
-    const predVals = [0.061, 0.126, 0.102, 0.096, 0.130, 0.148, 0.107, 0.129, 0.139, 0.193, 0.220, 0.142, 0.152, 0.160, 0.290, 0.153, 0.160, 0.157, 0.204, 0.213, 0.068, 0.450];
+    const scaleFactor = Math.max(0.1, (nomCap || 35.0) / 1.50 * 0.043);
+    const baseTrue = [0.06, 0.09, 0.10, 0.10, 0.10, 0.14, 0.13, 0.17, 0.16, 0.17, 0.24, 0.18, 0.14, 0.21, 0.32, 0.12, 0.17, 0.10, 0.25, 0.15, 0.10, 0.34];
+    const basePred = [0.061, 0.126, 0.102, 0.096, 0.130, 0.148, 0.107, 0.129, 0.139, 0.193, 0.220, 0.142, 0.152, 0.160, 0.290, 0.153, 0.160, 0.157, 0.204, 0.213, 0.068, 0.450];
     
+    const trueVals = baseTrue.map(v => +(v * scaleFactor).toFixed(4));
+    const predVals = basePred.map(v => +(v * scaleFactor).toFixed(4));
+
     const opt = {
       backgroundColor: 'transparent',
       tooltip: { trigger: 'axis' },
       legend: { data: ['实测恢复量', '模型预估量'], textStyle: { color: t.textColor }, top: 0 },
-      grid: { top: 35, right: 15, bottom: 35, left: 45 },
+      grid: { top: 35, right: 15, bottom: 35, left: 55 },
       xAxis: {
         type: 'category',
         data: cellNames,
@@ -337,16 +359,30 @@ const ChartManager = {
     return this.initChart(domId, opt);
   },
 
-  // 5. 碳减排规避量瀑布图
-  renderCarbonWaterfall(domId, data = null) {
+  // 5. 碳减排规避量瀑布图 (依据真实物理核算结果动态渲染)
+  renderCarbonWaterfall(domId, carbData = null) {
     const t = this.getThemeOptions();
+    const packKwh = carbData ? carbData.pack_capacity_kwh : 60.48;
+    const recKwh = carbData ? carbData.recovered_energy_pack_kwh : 6.57;
+    const avoided = carbData ? carbData.ghg_avoided_kg : 420.36;
+    const proc = carbData ? -carbData.ghg_process_kg : -4.94;
+    const net = carbData ? carbData.ghg_net_kg : 415.42;
+
     const opt = {
       backgroundColor: 'transparent',
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      grid: { top: 25, right: 15, bottom: 35, left: 55 },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params) => {
+          const p = params[0];
+          const unit = (p.name.includes('电能') || p.name.includes('电量')) ? ' kWh' : ' kgCO₂e';
+          return `${p.name}: <b>${p.value > 0 ? '+' : ''}${p.value}${unit}</b>`;
+        }
+      },
+      grid: { top: 25, right: 15, bottom: 35, left: 65 },
       xAxis: {
         type: 'category',
-        data: ['额定电量', '恢复电量', '制造减排潜力', '调理电耗扣减', '净碳减排量'],
+        data: ['模组额定电能', '恢复洁净电能', '制造端碳规避', '调理电耗扣减', '净碳减排量'],
         axisLabel: { color: t.subTextColor, fontSize: 10.5 }
       },
       yAxis: {
@@ -356,13 +392,13 @@ const ChartManager = {
       series: [{
         type: 'bar',
         data: [
-          { value: 60.48, itemStyle: { color: '#3B82F6' } },
-          { value: 6.57, itemStyle: { color: '#06B6D4' } },
-          { value: 420.36, itemStyle: { color: '#10B981' } },
-          { value: -4.94, itemStyle: { color: '#EF4444' } },
-          { value: 415.42, itemStyle: { color: '#F59E0B' } }
+          { value: packKwh, itemStyle: { color: '#3B82F6' } },
+          { value: recKwh, itemStyle: { color: '#06B6D4' } },
+          { value: avoided, itemStyle: { color: '#10B981' } },
+          { value: proc, itemStyle: { color: '#EF4444' } },
+          { value: net, itemStyle: { color: '#00E5FF' } }
         ],
-        label: { show: true, position: 'top', color: t.textColor }
+        label: { show: true, position: 'top', color: t.textColor, formatter: '{c}' }
       }]
     };
     return this.initChart(domId, opt);

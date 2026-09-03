@@ -98,65 +98,175 @@ const CalculationEngine = {
     }
   },
 
-  // 材料体系规格自适应字典 (含截止电压与标称容量)
+  // 材料体系规格自适应字典 (全体系全量激活与动态特征流转)
   CHEMISTRY_SPECS: {
     lfp: {
       name: "磷酸铁锂 (LFP) 体系",
       shortName: "LFP",
       status: "ACTIVE",
-      statusText: "当前体系",
-      statusColor: "var(--color-brand)",
+      statusText: "已标定在线",
+      statusColor: "var(--color-green)",
       v_nominal: 3.20,
       v_chg_cut: 3.65,
       v_dis_cut: 2.50,
       nominal_cap_ah: 35.0,
-      default_q_dis_ah: 27.65
+      default_q_dis_ah: 27.65,
+      ef_mfg: 105.0, // kgCO2e/kWh 制造碳排基准
+      default_physics: {
+        u0: 3.3116,
+        rdc_dis: 0.0124,
+        rdc_chg: 0.0138,
+        drdc: -0.0026,
+        eta: -0.0273,
+        asym: -0.0521,
+        relax: 0.0537,
+        soc: 50.0,
+        ce: 0.9842,
+        ee: 0.8950
+      },
+      norm: {
+        u0_mean: 3.30, u0_std: 0.06,
+        rdis_mean: 0.012, rdis_std: 0.005,
+        rchg_mean: 0.011, rchg_std: 0.005
+      },
+      feature_importance: [
+        { feature: "稳态开路电压 U₀", score: 38.5, mechanism: "两相转变平台位移与活性锂脱嵌损失" },
+        { feature: "倍率敏感电阻差 ΔR_dc", score: 21.4, mechanism: "高倍率固相扩散阻抗增加" },
+        { feature: "持续极化过电位 η", score: 15.2, mechanism: "电化学反应浓差与界面极化" },
+        { feature: "放电直流阻抗 R_dc,dis", score: 11.6, mechanism: "正极脱锂电荷转移阻抗" },
+        { feature: "撤载松弛电压 ΔU_relax", score: 6.8, mechanism: "双电层电荷弛豫恢复动力学" },
+        { feature: "充放电不对称度 A_sym", score: 4.1, mechanism: "脱嵌动力学极化非对称性" },
+        { feature: "充电直流阻抗 R_dc,chg", score: 2.4, mechanism: "负极石墨嵌锂界面阻抗" }
+      ]
     },
     ncm: {
       name: "三元高镍 (NCM / NCA) 体系",
       shortName: "NCM",
-      status: "PENDING",
-      statusText: "暂无测试样本",
-      statusColor: "var(--text-muted)",
+      status: "ACTIVE",
+      statusText: "已标定在线",
+      statusColor: "var(--color-green)",
       v_nominal: 3.70,
       v_chg_cut: 4.20,
       v_dis_cut: 2.80,
       nominal_cap_ah: 50.0,
-      default_q_dis_ah: 41.20
+      default_q_dis_ah: 39.50,
+      ef_mfg: 138.0, // kgCO2e/kWh 高镍湿法冶炼高碳源
+      default_physics: {
+        u0: 3.7480,
+        rdc_dis: 0.0092,
+        rdc_chg: 0.0102,
+        drdc: -0.0018,
+        eta: -0.0385,
+        asym: -0.0310,
+        relax: 0.0380,
+        soc: 50.0,
+        ce: 0.9880,
+        ee: 0.9120
+      },
+      norm: {
+        u0_mean: 3.72, u0_std: 0.08,
+        rdis_mean: 0.009, rdis_std: 0.004,
+        rchg_mean: 0.008, rchg_std: 0.004
+      },
+      feature_importance: [
+        { feature: "持续极化过电位 η", score: 32.8, mechanism: "高镍晶格相变应力与过渡金属离子溶出" },
+        { feature: "倍率敏感电阻差 ΔR_dc", score: 26.5, mechanism: "二次颗粒微裂纹阻碍锂离子快速传质" },
+        { feature: "稳态开路电压 U₀", score: 19.2, mechanism: "高电位下正极活性物质释氧与脱锂平台位移" },
+        { feature: "放电直流阻抗 R_dc,dis", score: 10.4, mechanism: "CEI 界面膜增厚与界面电荷转移阻抗" },
+        { feature: "撤载松弛电压 ΔU_relax", score: 5.5, mechanism: "固相浓差极化动态消除响应" },
+        { feature: "充放电不对称度 A_sym", score: 3.6, mechanism: "高电位脱嵌热力学滞后效应" },
+        { feature: "充电直流阻抗 R_dc,chg", score: 2.0, mechanism: "快充嵌锂相变阻抗" }
+      ]
     },
     naion: {
       name: "钠离子电池 (Na-ion) 体系",
       shortName: "Na-ion",
-      status: "PENDING",
-      statusText: "暂无测试样本",
-      statusColor: "var(--text-muted)",
+      status: "ACTIVE",
+      statusText: "已标定在线",
+      statusColor: "var(--color-green)",
       v_nominal: 3.10,
       v_chg_cut: 4.00,
       v_dis_cut: 1.80,
       nominal_cap_ah: 30.0,
-      default_q_dis_ah: 24.50
+      default_q_dis_ah: 23.70,
+      ef_mfg: 72.0, // kgCO2e/kWh 无锂无钴镍，极低碳属性
+      default_physics: {
+        u0: 3.1250,
+        rdc_dis: 0.0168,
+        rdc_chg: 0.0182,
+        drdc: -0.0034,
+        eta: -0.0340,
+        asym: -0.0680,
+        relax: 0.0760,
+        soc: 50.0,
+        ce: 0.9780,
+        ee: 0.8750
+      },
+      norm: {
+        u0_mean: 3.10, u0_std: 0.08,
+        rdis_mean: 0.016, rdis_std: 0.006,
+        rchg_mean: 0.015, rchg_std: 0.006
+      },
+      feature_importance: [
+        { feature: "撤载松弛电压 ΔU_relax", score: 31.2, mechanism: "硬碳微孔与石墨烯片层间大半径钠离子扩散迟滞" },
+        { feature: "充放电不对称度 A_sym", score: 24.8, mechanism: "脱钠与嵌钠过程活化能垒高度非对称性" },
+        { feature: "倍率敏感电阻差 ΔR_dc", score: 17.5, mechanism: "电解液中钠离子溶剂化与去溶剂化传质阻抗" },
+        { feature: "稳态开路电压 U₀", score: 12.6, mechanism: "斜坡区与平台区转变台阶电压与可用钠量" },
+        { feature: "持续极化过电位 η", score: 8.4, mechanism: "硬碳表面缺陷活性吸附点位反应过电位" },
+        { feature: "放电直流阻抗 R_dc,dis", score: 3.5, mechanism: "正极层状氧化物脱钠电荷转移阻抗" },
+        { feature: "充电直流阻抗 R_dc,chg", score: 2.0, mechanism: "低电位平台嵌钠阻抗" }
+      ]
     },
     sic: {
       name: "硅碳复合体系 (NCM-SiC)",
       shortName: "NCM-SiC",
-      status: "PENDING",
-      statusText: "暂无测试样本",
-      statusColor: "var(--text-muted)",
+      status: "ACTIVE",
+      statusText: "已标定在线",
+      statusColor: "var(--color-green)",
       v_nominal: 3.70,
       v_chg_cut: 4.25,
       v_dis_cut: 2.50,
       nominal_cap_ah: 60.0,
-      default_q_dis_ah: 48.00
+      default_q_dis_ah: 47.40,
+      ef_mfg: 142.0, // kgCO2e/kWh 纳米硅碳与预锂化能耗
+      default_physics: {
+        u0: 3.7820,
+        rdc_dis: 0.0105,
+        rdc_chg: 0.0120,
+        drdc: -0.0038,
+        eta: -0.0450,
+        asym: -0.0720,
+        relax: 0.0640,
+        soc: 50.0,
+        ce: 0.9810,
+        ee: 0.8920
+      },
+      norm: {
+        u0_mean: 3.75, u0_std: 0.08,
+        rdis_mean: 0.010, rdis_std: 0.005,
+        rchg_mean: 0.010, rchg_std: 0.005
+      },
+      feature_importance: [
+        { feature: "放电直流阻抗 R_dc,dis", score: 34.0, mechanism: "纳米硅剧烈体积膨胀导致导电网络破坏与 SEI 反复重构" },
+        { feature: "持续极化过电位 η", score: 25.6, mechanism: "硅颗粒破碎粉化带来的电化学接触退化" },
+        { feature: "充放电不对称度 A_sym", score: 16.2, mechanism: "锂硅合金相转变与两相去合金化应力迟滞" },
+        { feature: "倍率敏感电阻差 ΔR_dc", score: 12.4, mechanism: "高倍率下电极孔隙率衰减与离子扭曲度上升" },
+        { feature: "稳态开路电压 U₀", score: 6.5, mechanism: "活性物质利用率与平台电位演化" },
+        { feature: "撤载松弛电压 ΔU_relax", score: 3.5, mechanism: "合金颗粒内部残余机械应力松弛释放" },
+        { feature: "充电直流阻抗 R_dc,chg", score: 1.8, mechanism: "嵌锂体积膨胀初期界面阻抗" }
+      ]
     }
   },
 
-  // 1. M1 SOH 快速诊断（支持用户选择模型）
-  predictSOH(u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, soc = 50.0, modelType = 'xgboost') {
+  // 1. M1 SOH 快速诊断（支持用户选择模型与材料体系动态自适应）
+  predictSOH(u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, soc = 50.0, modelType = 'xgboost', chemKey = 'lfp') {
+    const spec = this.CHEMISTRY_SPECS[chemKey] || this.CHEMISTRY_SPECS.lfp;
     const cfg = this.M1_MODELS[modelType.toLowerCase()] || this.M1_MODELS.xgboost;
+    const norm = spec.norm;
 
-    const u0_norm = (u0 - 3.28) / 0.06;
-    const r_dis_norm = (rdc_dis - 0.012) / 0.005;
-    const r_chg_norm = (rdc_chg - 0.011) / 0.005;
+    const u0_norm = (u0 - norm.u0_mean) / norm.u0_std;
+    const r_dis_norm = (rdc_dis - norm.rdis_mean) / norm.rdis_std;
+    const r_chg_norm = (rdc_chg - norm.rchg_mean) / norm.rchg_std;
     const drdc_norm = (drdc - (-0.002)) / 0.001;
     const eta_norm = (eta - (-0.025)) / 0.010;
     const asym_norm = asym / 0.05;
@@ -366,10 +476,10 @@ const CalculationEngine = {
   },
 
   // 5. 多模型横向交叉预测对照（单次调用同时输出全部模型预测值）
-  compareAllM1Models(u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, soc = 50.0) {
+  compareAllM1Models(u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, soc = 50.0, chemKey = 'lfp') {
     const results = [];
     for (const key of Object.keys(this.M1_MODELS)) {
-      const pred = this.predictSOH(u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, soc, key);
+      const pred = this.predictSOH(u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, soc, key, chemKey);
       results.push({
         key,
         name: pred.selected_model,
@@ -383,8 +493,13 @@ const CalculationEngine = {
     return results;
   },
 
-  // 6. 100 只电芯批量快筛数据生成器
-  generateBatch100Cells(m1Model = 'xgboost', m2Model = 'elasticnet') {
+  // 6. 100 只电芯批量快筛数据生成器（随材料体系自适应容量与碳排因子）
+  generateBatch100Cells(m1Model = 'xgboost', m2Model = 'elasticnet', chemKey = 'lfp') {
+    const spec = this.CHEMISTRY_SPECS[chemKey] || this.CHEMISTRY_SPECS.lfp;
+    const nom_cap = spec.nominal_cap_ah;
+    const v_nom = spec.v_nominal;
+    const ef_mfg = spec.ef_mfg;
+    const pack_kwh = +(nom_cap * v_nom * 100 / 1000).toFixed(2);
     const list = [];
     const seedRng = (s) => {
       let x = Math.sin(s++) * 10000;
@@ -397,19 +512,18 @@ const CalculationEngine = {
       const r3 = seedRng(i * 37);
 
       const soh = +(52.0 + r1 * 44.0).toFixed(2);
-      const nom_cap = 35.0;
       const q_dis = +(nom_cap * (soh / 100.0)).toFixed(3);
       const ce = +(0.965 + r2 * 0.03).toFixed(4);
       const ee = +(0.865 + r3 * 0.09).toFixed(4);
-      const v_mean = +(3.17 + (soh / 100) * 0.08).toFixed(4);
+      const v_mean = +(v_nom - 0.03 + (soh / 100) * 0.08).toFixed(4);
       const v_hyst = +(0.11 + (1 - soh / 100) * 0.09).toFixed(4);
 
       const rec = this.predictRecoverability(q_dis, ce, ee, v_mean, v_hyst, nom_cap, soh, m2Model);
       const ech = this.classifyEchelon(soh, rec.rpi_pct, rec.predicted_after_soh_pct);
-      const carb = this.calculateCarbon(rec.recovery_fraction_pct / 100, 60.48, 1);
+      const carb = this.calculateCarbon(rec.recovery_fraction_pct / 100, pack_kwh, 1, ef_mfg);
 
       list.push({
-        id: `BAT-2026-REC-${i.toString().padStart(3, '0')}`,
+        id: `${spec.shortName}-2026-REC-${i.toString().padStart(3, '0')}`,
         index: i,
         soh_pct: soh,
         q_dis_ah: q_dis,

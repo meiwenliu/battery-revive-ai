@@ -65,7 +65,7 @@ const ReportGenerator = {
             <td class="label">恢复潜力指数 (RPI)</td>
             <td><strong>${data.rpi_pct}%</strong></td>
             <td class="label">调理后预期 SOH</td>
-            <td><strong style="color:#0284C7; font-size:15px;">${data.predicted_after_soh_pct}%</strong> (净增益 +${data.soh_gain_pct}%)</td>
+            <td><strong style="color:#0284C7; font-size:15px;">${data.predicted_after_soh_pct}%</strong> (预期提升幅度 +${data.soh_gain_pct}%)</td>
           </tr>
         </table>
 
