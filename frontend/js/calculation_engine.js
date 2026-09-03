@@ -641,11 +641,11 @@ const CalculationEngine = {
     return results;
   },
 
-  // 6. 100 只电芯批量快筛数据生成器（随材料体系自适应容量与碳排因子）
-  generateBatch100Cells(m1Model = 'xgboost', m2Model = 'elasticnet', chemKey = 'lfp') {
+  // 6. 100 只电芯批量快筛数据生成器（随材料体系、用户自定标称容量与工作电压自适应动态推演）
+  generateBatch100Cells(m1Model = 'xgboost', m2Model = 'elasticnet', chemKey = 'lfp', custom_nom_cap = null, custom_v_nom = null) {
     const spec = this.CHEMISTRY_SPECS[chemKey] || this.CHEMISTRY_SPECS.lfp;
-    const nom_cap = spec.nominal_cap_ah;
-    const v_nom = spec.v_nominal;
+    const nom_cap = (custom_nom_cap && custom_nom_cap > 0) ? custom_nom_cap : spec.nominal_cap_ah;
+    const v_nom = (custom_v_nom && custom_v_nom > 0) ? custom_v_nom : spec.v_nominal;
     const ef_mfg = spec.ef_mfg;
     const pack_kwh = +(nom_cap * v_nom * 100 / 1000).toFixed(2);
     const list = [];
@@ -671,11 +671,12 @@ const CalculationEngine = {
       const carb = this.calculateCarbon(rec.recovery_fraction_pct / 100, pack_kwh, 1, ef_mfg);
 
       list.push({
-        id: `${spec.shortName}-2026-REC-${i.toString().padStart(3, '0')}`,
+        id: `${spec.shortName}-${Math.round(nom_cap)}Ah-REC-${i.toString().padStart(3, '0')}`,
         index: i,
         soh_pct: soh,
         q_dis_ah: q_dis,
         nom_cap_ah: nom_cap,
+        v_nom: v_nom,
         q_rec_ah: rec.predicted_qrec_ah,
         rpi_pct: rec.rpi_pct,
         after_soh_pct: rec.predicted_after_soh_pct,

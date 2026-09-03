@@ -271,18 +271,22 @@ document.addEventListener('DOMContentLoaded', () => {
       statusBadge.style.color = spec.statusColor;
     }
 
-    // 全体系活跃看板：彻底打破空白遮罩，多体系全量实时计算呈现
+    // 全体系活跃看板：彻底确保全体系 100% 呈现，无留白无等待
     const activeBoard = document.getElementById('dashboardActiveContent');
-    const blankBoard = document.getElementById('dashboardPendingBlankState');
     if (activeBoard) activeBoard.style.display = 'flex';
-    if (blankBoard) blankBoard.style.display = 'none';
 
     // 依据当前体系重新生成真实的 100 只电芯批量数据与矩阵
-    batch100 = CalculationEngine.generateBatch100Cells('xgboost', 'elasticnet', chemKey);
+    const curNomCap = parseFloat(document.getElementById('inputNomCap')?.value) || spec.nominal_cap_ah;
+    const curVNom = parseFloat(document.getElementById('inputVNom')?.value) || spec.v_nominal;
+    batch100 = CalculationEngine.generateBatch100Cells('xgboost', 'elasticnet', chemKey, curNomCap, curVNom);
     renderPackMatrix();
     renderBatchTable();
 
-    // 联动刷新 Tab 4 再利用等级分布环形图
+    // 联动刷新 Tab 4 再利用等级分布环形图与计数
+    updateBatchCounts();
+  }
+
+  function updateBatchCounts() {
     const counts = { classA: 0, classB: 0, classC: 0, classD: 0 };
     batch100.forEach(c => {
       if (c.tier_code === 'CLASS_A') counts.classA++;
@@ -290,6 +294,18 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (c.tier_code === 'CLASS_C') counts.classC++;
       else if (c.tier_code === 'CLASS_D') counts.classD++;
     });
+
+    if (document.getElementById('legendCountA')) document.getElementById('legendCountA').textContent = `A级(${counts.classA})`;
+    if (document.getElementById('legendCountB')) document.getElementById('legendCountB').textContent = `B级(${counts.classB})`;
+    if (document.getElementById('legendCountC')) document.getElementById('legendCountC').textContent = `C级(${counts.classC})`;
+    if (document.getElementById('legendCountD')) document.getElementById('legendCountD').textContent = `D级(${counts.classD})`;
+
+    if (document.getElementById('pillCountAll')) document.getElementById('pillCountAll').textContent = `全部(100)`;
+    if (document.getElementById('pillCountA')) document.getElementById('pillCountA').textContent = `A级(${counts.classA})`;
+    if (document.getElementById('pillCountB')) document.getElementById('pillCountB').textContent = `B级(${counts.classB})`;
+    if (document.getElementById('pillCountC')) document.getElementById('pillCountC').textContent = `C级(${counts.classC})`;
+    if (document.getElementById('pillCountD')) document.getElementById('pillCountD').textContent = `D级(${counts.classD})`;
+
     ChartManager.renderBatchDonut('batchDonutChart', counts);
   }
 
@@ -607,6 +623,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 联动刷新 Tab 5 碳减排瀑布分解图 (完全基于当前真实计算结果重绘)
     ChartManager.renderCarbonWaterfall('carbonWaterfallChart', carbRes);
+
+    // 5.1 依据当前用户输入的体系、标称容量与工作电压，全量动态重构 100 只电芯矩阵看板与分选明细
+    batch100 = CalculationEngine.generateBatch100Cells(selM1, selM2, chemKey, nom_cap, v_nom);
+    
+    const headerEl = document.getElementById('valPackMatrixHeader');
+    if (headerEl) headerEl.textContent = `${packKwh} kWh 储能模组 100 只电芯阵列 (${spec.name.split(' ')[0]} ${nom_cap}Ah · 实时自适应)`;
+    
+    const ecoHeaderEl = document.getElementById('valEcoHeader');
+    if (ecoHeaderEl) ecoHeaderEl.textContent = `制造端碳减排规避量化成果 (${packKwh} kWh 模组等效)`;
+
+    renderPackMatrix();
+    renderBatchTable();
+    updateBatchCounts();
 
     // 6. 生成决策评估报告 (将当前体系真实数据与全部计算指标注入)
     ReportGenerator.renderReport('reportContainer', {

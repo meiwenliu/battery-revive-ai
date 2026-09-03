@@ -412,18 +412,18 @@
               </div>
             </div>
 
-            <!-- 60.48 kWh 储能电池 100 电芯矩阵看板 (点击任意电芯立即在上方表盘显示，绝不跳页) -->
+            <!-- 储能电池 100 电芯矩阵看板 (随材料体系、标称容量与电压实时自适应重构) -->
             <div class="pack-matrix-container">
               <div class="laser-scan-bar"></div>
               <div class="pack-matrix-header">
                 <div style="font-weight:700; font-size:12px;">
-                  <span>🔋</span> 60.48 kWh 标准储能电池模组 100 只电芯阵列 (点击任意电芯即时在上方表盘更新)
+                  <span>🔋</span> <span id="valPackMatrixHeader">11.20 kWh 储能模组 100 只电芯阵列 (随左侧输入实时自适应)</span>
                 </div>
-                <div class="pack-legend">
-                  <div class="legend-item"><span class="legend-color class-a"></span>A级(38)</div>
-                  <div class="legend-item"><span class="legend-color class-b"></span>B级(41)</div>
-                  <div class="legend-item"><span class="legend-color class-c"></span>C级(15)</div>
-                  <div class="legend-item"><span class="legend-color class-d"></span>D级(6)</div>
+                <div class="pack-legend" id="packLegendCounts">
+                  <div class="legend-item"><span class="legend-color class-a"></span><span id="legendCountA">A级(35)</span></div>
+                  <div class="legend-item"><span class="legend-color class-b"></span><span id="legendCountB">B级(42)</span></div>
+                  <div class="legend-item"><span class="legend-color class-c"></span><span id="legendCountC">C级(17)</span></div>
+                  <div class="legend-item"><span class="legend-color class-d"></span><span id="legendCountD">D级(6)</span></div>
                 </div>
               </div>
               <div class="pack-cells-grid" id="packCellsGrid"></div>
@@ -433,7 +433,7 @@
             <div class="card" style="padding:12px 14px;">
               <div class="card-header" style="margin-bottom:8px;">
                 <div class="card-title" style="font-size:13px;">
-                  <span>🌱</span> 制造端碳减排规避量化成果 (60.48 kWh 包等效)
+                  <span>🌱</span> <span id="valEcoHeader">制造端碳减排规避量化成果 (11.20 kWh 模组等效)</span>
                 </div>
               </div>
               
@@ -461,29 +461,6 @@
               </div>
             </div>
 
-          </div>
-
-          <!-- 2. 待接入体系专属留白状态卡片（当用户切换到其他体系时干净留白） -->
-          <div id="dashboardPendingBlankState" style="display:none; flex-direction:column; gap:16px;">
-            <div class="card" style="padding:40px 24px; text-align:center; min-height:500px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px dashed rgba(0, 229, 255, 0.35); background:radial-gradient(ellipse at center, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 29, 0.98) 100%);">
-              <div style="width:72px; height:72px; border-radius:50%; background:rgba(0, 229, 255, 0.1); display:flex; align-items:center; justify-content:center; font-size:34px; margin-bottom:18px; border:1px solid rgba(0, 229, 255, 0.35); box-shadow:0 0 28px rgba(0, 229, 255, 0.2);">
-                🔬
-              </div>
-              <h3 id="blankStateChemTitle" style="font-size:19px; font-weight:800; color:var(--color-cyan); margin-bottom:10px;">【三元高镍体系】</h3>
-              <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.8; max-width:540px; margin:0 auto 24px;">
-                当前所选材料体系暂无测试样本接入，右侧决策看板保持留白。<br>
-                您可以在左侧调整电芯参数，或切回磷酸铁锂体系查看完整决策看板。
-              </p>
-              <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:6px; padding:12px 20px; margin-bottom:24px; font-size:12.5px; color:var(--text-muted); display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
-                <span>标称电压 <i>U</i><sub>nom</sub>：<strong id="blankStateVNom" style="color:var(--text-primary);">3.70 V</strong></span>
-                <span>充电截止 <i>U</i><sub>chg,cut</sub>：<strong id="blankStateVChg" style="color:var(--text-primary);">4.20 V</strong></span>
-                <span>放电截止 <i>U</i><sub>dis,cut</sub>：<strong id="blankStateVDis" style="color:var(--text-primary);">2.80 V</strong></span>
-                <span>标称容量 <i>C</i><sub>nom</sub>：<strong id="blankStateNomCap" style="color:var(--text-primary);">50.0 Ah</strong></span>
-              </div>
-              <button class="btn btn-primary" onclick="switchToVerifiedLFP()" style="padding:10px 24px; font-size:13.5px;">
-                ⚡ 切换至【磷酸铁锂 (LFP)】查看完整决策看板
-              </button>
-            </div>
           </div>
 
         </div>
@@ -613,11 +590,11 @@
 
           <div class="batch-filter-bar">
             <div class="filter-pills">
-              <button class="filter-pill active" data-filter="ALL">全部(100)</button>
-              <button class="filter-pill" data-filter="CLASS_A">A级(38)</button>
-              <button class="filter-pill" data-filter="CLASS_B">B级(41)</button>
-              <button class="filter-pill" data-filter="CLASS_C">C级(15)</button>
-              <button class="filter-pill" data-filter="CLASS_D">D级(6)</button>
+              <button class="filter-pill active" data-filter="ALL" id="pillCountAll">全部(100)</button>
+              <button class="filter-pill" data-filter="CLASS_A" id="pillCountA">A级(35)</button>
+              <button class="filter-pill" data-filter="CLASS_B" id="pillCountB">B级(42)</button>
+              <button class="filter-pill" data-filter="CLASS_C" id="pillCountC">C级(17)</button>
+              <button class="filter-pill" data-filter="CLASS_D" id="pillCountD">D级(6)</button>
             </div>
           </div>
 
