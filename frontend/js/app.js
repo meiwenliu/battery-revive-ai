@@ -415,12 +415,81 @@ document.addEventListener('DOMContentLoaded', () => {
     // 单电芯微观物理卡片
     renderCellPhysicsGrid(null, false);
 
-    // 生态指标
+    // 生态指标 (Tab 1)
     if (document.getElementById('valGhgAvoided')) document.getElementById('valGhgAvoided').textContent = '-- kg';
     if (document.getElementById('valGhgNet')) document.getElementById('valGhgNet').textContent = '-- kg';
     if (document.getElementById('valCo2Vol')) document.getElementById('valCo2Vol').textContent = '-- m³';
     if (document.getElementById('valTrees')) document.getElementById('valTrees').textContent = '-- 棵';
+
+    // ==================== Tab 3: M1 SOH 诊断待测如实呈现 ====================
+    ChartManager.renderEmptyState('m1FeatureChart', '待接入实测脉冲数据', '尚未采集当前电芯的电化学阻抗与瞬态时序，特征工程保持留空');
+    ChartManager.renderEmptyState('m1ModelCompareChart', '待接入实测脉冲数据', '无真实测量数据输入，M1 多模型误差对照暂不触发');
+    const compTableBody = document.getElementById('multiModelCompareBody');
+    if (compTableBody) {
+      compTableBody.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align:center; padding:32px 15px; color:var(--text-muted);">
+            <div style="font-size:22px; margin-bottom:8px;">⏳</div>
+            <div style="font-weight:700; color:var(--text-secondary); margin-bottom:4px;">待接入实测脉冲数据 · 暂未开展 M1 SOH 诊断</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">系统严格遵循科研公信力规范：无真实测试仪测量数据时，不凭空生成虚假模型预测对比。</div>
+          </td>
+        </tr>
+      `;
+    }
+
+    // ==================== Tab 4: M2 容量恢复与批量分选待测如实呈现 ====================
+    ChartManager.renderEmptyState('m2ConformalChart', '待接入实测电化学数据', '需提供当前电芯实测放电容量与库仑效率以激活 90% 保角置信区间');
+    const packGrid = document.getElementById('packCellsGrid');
+    if (packGrid) {
+      packGrid.innerHTML = `
+        <div style="grid-column:span 10; padding:28px 15px; text-align:center; background:rgba(255,255,255,0.02); border:1px dashed var(--border-color); border-radius:8px;">
+          <div style="font-size:24px; margin-bottom:6px;">🔋</div>
+          <div style="font-weight:700; color:var(--text-secondary); margin-bottom:4px;">批量退役电芯分选矩阵 · 等待批次测试数据接入</div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">当前尚未载入该批次电芯的实测放电与阻抗数据。无真实测量数据时，系统绝不生成虚构电芯。</div>
+          <button class="btn btn-primary" style="font-size:12px;" onclick="loadBatchBenchmark()">⚡ 一键载入国家退役模组 100 只实测分选批次</button>
+        </div>
+      `;
+    }
+    if (document.getElementById('valPackMatrixHeader')) {
+      document.getElementById('valPackMatrixHeader').textContent = '国家标准储能梯次退役模组 100 只电芯批量阵列 (待批次实测数据接入)';
+    }
+    ['legendCountA', 'legendCountB', 'legendCountC', 'legendCountD'].forEach((id, idx) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = `${['A','B','C','D'][idx]}级(--)`;
+    });
+    ['pillCountAll', 'pillCountA', 'pillCountB', 'pillCountC', 'pillCountD'].forEach((id, idx) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = `${idx === 0 ? '全部' : ['A','B','C','D'][idx-1] + '级'}(--)`;
+    });
+    const bTable = document.getElementById('batchTableBody');
+    if (bTable) {
+      bTable.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center; padding:28px 15px; color:var(--text-muted);">
+            <div style="font-size:12.5px; color:var(--text-secondary);">暂无批量测试数据 (等待导入批量 CSV 或载入实测批次)</div>
+          </td>
+        </tr>
+      `;
+    }
+    ChartManager.renderEmptyState('batchDonutChart', '等级分布待计算', '批次数据接入后呈现分选占比');
+
+    // ==================== Tab 5: M3 制造端碳减排待测如实呈现 ====================
+    if (document.getElementById('m3TableRecoveredKwh')) document.getElementById('m3TableRecoveredKwh').textContent = '-- kWh';
+    if (document.getElementById('m3TableEfMfg')) document.getElementById('m3TableEfMfg').textContent = `-- kgCO₂e/kWh (${spec.shortName}体系)`;
+    if (document.getElementById('m3TableGhgAvoided')) document.getElementById('m3TableGhgAvoided').textContent = '-- kgCO₂e';
+    if (document.getElementById('m3TableGridKwh')) document.getElementById('m3TableGridKwh').textContent = '-- kWh';
+    if (document.getElementById('m3TableGridGhg')) document.getElementById('m3TableGridGhg').textContent = '-- kgCO₂e';
+    if (document.getElementById('m3TableCleanEnergy')) document.getElementById('m3TableCleanEnergy').innerHTML = '<strong>-- kWh 洁净电量</strong>';
+    if (document.getElementById('m3TableNetGhg')) document.getElementById('m3TableNetGhg').textContent = '-- kgCO₂e';
+    ChartManager.renderEmptyState('carbonWaterfallChart', '碳减排链路待核算', '等待容量恢复实测值驱动全生命周期碳排分解');
+
+    // ==================== Tab 7: 决策报告待测如实呈现 ====================
+    ReportGenerator.renderReport('reportContainer', null);
   }
+
+  window.loadBatchBenchmark = function() {
+    loadBenchmarkCell('retire_lfp');
+  };
 
   window.loadBenchmarkForCurrentChem = function() {
     const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';

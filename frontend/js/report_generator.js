@@ -6,6 +6,21 @@ const ReportGenerator = {
     const el = document.getElementById(containerId);
     if (!el) return;
 
+    if (!data) {
+      el.innerHTML = `
+        <div style="padding:60px 20px; text-align:center; background:rgba(255,255,255,0.02); border:1px dashed var(--border-color); border-radius:8px; margin:20px auto; max-width:600px;">
+          <div style="font-size:36px; margin-bottom:12px;">📑</div>
+          <h3 style="font-size:16px; color:var(--text-secondary); margin-bottom:8px;">智能决策评估报告 · 处于待生成状态</h3>
+          <p style="font-size:13px; color:var(--text-muted); line-height:1.7; margin-bottom:20px;">
+            当前电芯尚未接入真实测量数据（无实测充放电脉冲时序）。系统严禁出具缺乏测量数据支撑的虚构报告。<br>
+            请在【极速诊断决策工作台】导入测试仪 CSV 文件或选择国家台架实测标定电芯。
+          </p>
+          <button class="btn btn-primary" onclick="loadBenchmarkForCurrentChem()">⚡ 一键调取本体系台架实测样本生成报告</button>
+        </div>
+      `;
+      return;
+    }
+
     const now = new Date();
     const timeStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
     const reportId = 'REP-' + now.getTime().toString().slice(-8);

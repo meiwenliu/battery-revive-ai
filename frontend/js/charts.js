@@ -8,6 +8,13 @@ const ChartManager = {
   setTheme(theme) {
     const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';
     const nomCap = parseFloat(document.getElementById('inputNomCap')?.value) || 35.0;
+
+    if (typeof isMeasurementDataLoaded !== 'undefined' && !isMeasurementDataLoaded) {
+      if (typeof renderUnmeasuredState === 'function') {
+        renderUnmeasuredState(chemKey);
+      }
+      return;
+    }
     this.renderM1FeatureImportance('m1FeatureChart', chemKey);
     this.renderM1ModelCompare('m1ModelCompareChart', document.getElementById('selM1Model')?.value || 'xgboost');
     this.renderM2Conformal('m2ConformalChart', nomCap);
@@ -55,6 +62,52 @@ const ChartManager = {
     Object.values(this.charts).forEach(c => {
       try { if (c) c.resize(); } catch (e) {}
     });
+  },
+
+  // 空状态与待测占位渲染器 (无测量数据时严禁出具虚假图表)
+  renderEmptyState(domId, title = "待接入实测数据", desc = "无真实测量脉冲时序时，系统严格留空，不凭空推演") {
+    const el = document.getElementById(domId);
+    if (!el) return;
+    if (this.charts[domId]) {
+      this.charts[domId].dispose();
+      delete this.charts[domId];
+    }
+    const isLight = this.currentTheme === 'light';
+    const chart = echarts.init(el, isLight ? null : 'dark', { renderer: 'canvas' });
+    const opt = {
+      backgroundColor: 'transparent',
+      graphic: {
+        type: 'group',
+        left: 'center',
+        top: 'middle',
+        children: [
+          {
+            type: 'text',
+            z: 100,
+            left: 'center',
+            top: -14,
+            style: {
+              fill: isLight ? '#64748B' : '#94A3B8',
+              text: '⏳ ' + title,
+              font: 'bold 14px sans-serif'
+            }
+          },
+          {
+            type: 'text',
+            z: 100,
+            left: 'center',
+            top: 14,
+            style: {
+              fill: isLight ? '#94A3B8' : '#64748B',
+              text: desc,
+              font: '12px sans-serif'
+            }
+          }
+        ]
+      }
+    };
+    chart.setOption(opt);
+    this.charts[domId] = chart;
   },
 
   // 0. SOH 现代化动态发光圆弧仪表盘 (高端无指针设计，数字居中发光，彻底消除重叠)
