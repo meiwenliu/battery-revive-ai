@@ -15,6 +15,11 @@ const ChartManager = {
     this.renderCarbonWaterfall('carbonWaterfallChart');
     this.renderBatchDonut('batchDonutChart');
     this.renderSohGauge('sohGaugeChart', parseFloat(document.getElementById('valSOH')?.textContent) || 75.4);
+    if (typeof VaultManager !== 'undefined' && VaultManager.currentRecords) {
+      this.renderVaultHistoryChart('vaultHistoryChart', VaultManager.currentRecords);
+    } else {
+      this.renderVaultHistoryChart('vaultHistoryChart');
+    }
   },
 
   getThemeOptions() {
@@ -426,6 +431,95 @@ const ChartManager = {
           { value: counts.classD, name: 'D级(提锂再生)', itemStyle: { color: '#EF4444' } }
         ]
       }]
+    };
+  },
+
+  // 7. 电池终身多节点健康衰减与容量恢复时序轨迹图
+  renderVaultHistoryChart(domId, records = null) {
+    const t = this.getThemeOptions();
+    const defaultRecords = [
+      { stage: '出厂初始标定', date: '2023-03-15', soh: 100.0, rdc: 9.8, note: '出厂参考基准' },
+      { stage: '1.2万km首检', date: '2024-01-20', soh: 93.6, rdc: 11.2, note: '常规健康体检' },
+      { stage: '2.8万km巡检', date: '2024-11-08', soh: 86.4, rdc: 12.8, note: '夏季高温后体检' },
+      { stage: '4.5万km退役初检', date: '2025-08-30', soh: 75.4, rdc: 14.8, note: '达成储能分选条件' },
+      { stage: '微调理激活再生', date: '2025-09-02', soh: 82.2, rdc: 12.1, note: '活性锂脱嵌恢复' }
+    ];
+    const dataList = (records && records.length > 0) ? records : defaultRecords;
+    const stages = dataList.map(r => r.stage);
+    const sohVals = dataList.map(r => r.soh);
+    const rdcVals = dataList.map(r => r.rdc);
+
+    const opt = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'axis',
+        formatter: (params) => {
+          const idx = params[0].dataIndex;
+          const r = dataList[idx];
+          return `<div style="font-weight:bold; margin-bottom:4px; color:#00E5FF;">${r.stage} (${r.date})</div>
+                  <div>SOH 健康度: <b style="color:#10B981;">${r.soh}%</b></div>
+                  <div>直流阻抗 R_dc: <b style="color:#F59E0B;">${r.rdc} mΩ</b></div>
+                  <div style="color:#94A3B8; font-size:11px; margin-top:2px;">备注: ${r.note || '正常归档'}</div>`;
+        }
+      },
+      legend: {
+        data: ['SOH 健康度 (%)', '直流阻抗 (mΩ)'],
+        top: 0,
+        textStyle: { color: t.textColor }
+      },
+      grid: { top: 35, right: 45, bottom: 35, left: 45 },
+      xAxis: {
+        type: 'category',
+        data: stages,
+        axisLabel: { color: t.subTextColor, fontSize: 10.5, interval: 0 }
+      },
+      yAxis: [
+        {
+          type: 'value',
+          name: 'SOH (%)',
+          min: 50,
+          max: 105,
+          splitLine: { lineStyle: { color: t.splitLineColor } },
+          axisLabel: { color: t.subTextColor, formatter: '{value}%' }
+        },
+        {
+          type: 'value',
+          name: '阻抗 (mΩ)',
+          min: 5,
+          max: 25,
+          splitLine: { show: false },
+          axisLabel: { color: t.subTextColor, formatter: '{value}' }
+        }
+      ],
+      series: [
+        {
+          name: 'SOH 健康度 (%)',
+          type: 'line',
+          yAxisIndex: 0,
+          data: sohVals,
+          smooth: true,
+          symbolSize: 9,
+          lineStyle: { color: '#10B981', width: 3 },
+          itemStyle: { color: '#10B981', borderColor: '#FFFFFF', borderWidth: 1.5 },
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            data: [{ yAxis: 80, lineStyle: { color: '#EF4444', type: 'dashed', width: 1.5 }, label: { formatter: '储能梯次基准 (80%)', color: '#EF4444', position: 'insideEndTop' } }]
+          },
+          label: { show: true, position: 'top', formatter: '{c}%', color: t.textColor, fontWeight: 'bold' }
+        },
+        {
+          name: '直流阻抗 (mΩ)',
+          type: 'line',
+          yAxisIndex: 1,
+          data: rdcVals,
+          smooth: true,
+          symbolSize: 8,
+          lineStyle: { color: '#F59E0B', width: 2, type: 'dotted' },
+          itemStyle: { color: '#F59E0B' },
+          label: { show: true, position: 'bottom', formatter: '{c}mΩ', color: '#F59E0B', fontSize: 10 }
+        }
+      ]
     };
     return this.initChart(domId, opt);
   }

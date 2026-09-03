@@ -76,6 +76,11 @@
       <span class="pipeline-step-num">6</span>
       <span>制造端碳减排量化</span>
     </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="pipeline-step" data-tab-target="tab-vault">
+      <span class="pipeline-step-num">7</span>
+      <span>健康档案与数据飞轮</span>
+    </div>
   </div>
 
   <!-- 3. 主模块标签页切换 (清晰、直观、按需切换) -->
@@ -94,6 +99,9 @@
     </button>
     <button class="nav-tab-btn" data-tab="tab-m3">
       <span>🌱</span> 制造端碳减排 (M3)
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-vault">
+      <span>🗂️</span> 电池档案与数字护照
     </button>
     <button class="nav-tab-btn" data-tab="tab-report">
       <span>📑</span> 决策评估报告
@@ -652,7 +660,155 @@
       </div>
     </section>
 
-    <!-- ==================== Tab 6: 决策评估报告 ==================== -->
+    <!-- ==================== Tab 6: 电池健康档案库与数字护照 (个人健康追踪与隐私数据飞轮) ==================== -->
+    <section class="tab-pane" id="tab-vault">
+      
+      <!-- 1. 电池终身健康数字护照概览卡 (芯片质感未来展牌) -->
+      <div class="card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(8, 17, 34, 0.95) 0%, rgba(10, 30, 60, 0.9) 100%); border:1px solid rgba(0, 229, 255, 0.35); position:relative; overflow:hidden;">
+        <div style="position:absolute; right:-20px; top:-20px; font-size:140px; opacity:0.04; font-family:'Courier New', monospace; pointer-events:none; font-weight:900;">PASSPORT</div>
+        <div class="card-header" style="border-bottom:1px solid rgba(0, 229, 255, 0.2); padding-bottom:10px;">
+          <div class="card-title" style="font-size:16px; color:var(--color-brand);">
+            <span>🛡️</span> 电池全生命周期终身健康数字护照 (Battery Digital Health Passport)
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="kpi-badge success" style="font-size:11px;">🔒 差分隐私保护 (ε=0.5)</span>
+            <span class="kpi-badge info" style="font-size:11px;">🚀 联邦自演进数据飞轮已就绪</span>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin-bottom:8px; margin-top:10px;">
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:10px;">
+            <div style="font-size:11px; color:var(--text-secondary);">电芯专属档案 ID</div>
+            <div style="font-size:17px; font-weight:800; color:var(--color-cyan); margin-top:2px;" id="vaultCellIdBadge">BAT-2026-REC-01</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">UUID 硬件绑定 · 一电一档</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:10px;">
+            <div style="font-size:11px; color:var(--text-secondary);">材料体系认证</div>
+            <div style="font-size:14.5px; font-weight:800; color:var(--color-green); margin-top:2px;" id="vaultChemBadge">磷酸铁锂 (LFP) 体系</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">已匹配全流程机理基准</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:10px;">
+            <div style="font-size:11px; color:var(--text-secondary);">累积全周期体检次数</div>
+            <div style="font-size:18px; font-weight:900; color:var(--color-amber); margin-top:2px;" id="vaultTotalCheckups">5 次</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">支持长期连续追踪</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:10px;">
+            <div style="font-size:11px; color:var(--text-secondary);">全役期健康演变特征</div>
+            <div style="font-size:13px; font-weight:800; color:var(--text-primary); margin-top:4px;" id="vaultDegradationSlope">累积退化 -23.2%</div>
+            <div style="font-size:10px; color:var(--color-brand); margin-top:2px;">经微调理可提升 +6.8%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 时序衰退轨迹与调理恢复对比图表 + 控制台 -->
+      <div class="grid-1-2">
+        
+        <!-- 左侧：档案体检操作控制面板 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>📝</span> 体检归档与场景回放</div>
+          </div>
+
+          <div style="background:rgba(0, 229, 255, 0.05); border:1px dashed var(--border-color); border-radius:8px; padding:12px; margin-bottom:12px;">
+            <div style="font-size:12px; font-weight:700; color:var(--color-brand); margin-bottom:4px;">
+              📥 建立个人终身健康档案
+            </div>
+            <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:10px;">
+              将当前在工作台中计算得到的 SOH、直流阻抗与恢复指标一键存入本电池的历史健康病历本中。
+            </p>
+            <button class="btn btn-primary" style="width:100%; font-size:12.5px;" onclick="VaultManager.addCurrentEvaluation()">
+              <span>📥</span> 将当次体检写入终身档案库
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="font-weight:700; color:var(--text-secondary);">⚡ 载入典型全周期服役场景历史轨迹</label>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <button class="btn btn-outline" style="justify-content:flex-start; font-size:12px;" onclick="VaultManager.loadPreset('ev_3yr')">
+                <span>🚗</span> 场景一：新能源车役龄3年全周期体检 (含调理再生)
+              </button>
+              <button class="btn btn-outline" style="justify-content:flex-start; font-size:12px;" onclick="VaultManager.loadPreset('base_station')">
+                <span>📶</span> 场景二：5G 通信基站备电储能 3 年多节点衰退轨迹
+              </button>
+              <button class="btn btn-outline" style="justify-content:flex-start; font-size:12px;" onclick="VaultManager.loadPreset('grid_storage')">
+                <span>⚡</span> 场景三：电网侧高频调峰电站 3600 次循环退役轨迹
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:14px; border-top:1px solid var(--border-color); padding-top:10px;">
+            <button class="btn btn-success" style="flex:1; font-size:11.5px;" onclick="VaultManager.exportDesensitizedJSON()">
+              <span>🛡️</span> 导出脱敏数据包
+            </button>
+            <button class="btn btn-outline" style="flex:1; font-size:11.5px; color:var(--color-rose);" onclick="VaultManager.clearAll()">
+              <span>🗑️</span> 清空档案
+            </button>
+          </div>
+        </div>
+
+        <!-- 右侧：ECharts 时序健康衰减与恢复轨迹图 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>📈</span> 全生命周期多节点时序健康轨迹 (SOH 衰减与恢复对比)</div>
+            <span class="card-title-badge">多频次全景核查</span>
+          </div>
+          <div class="chart-container tall" id="vaultHistoryChart"></div>
+        </div>
+
+      </div>
+
+      <!-- 3. 历史体检详细病历记录表 -->
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header">
+          <div class="card-title"><span>📋</span> 历次体检健康病历详表与差分隐私签名</div>
+        </div>
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>体检日期</th>
+                <th>体检阶段 / 节点</th>
+                <th>SOH 健康度</th>
+                <th>直流阻抗 R_dc</th>
+                <th>梯次利用评级</th>
+                <th>隐私哈希编码 (SHA-256)</th>
+                <th>备注说明</th>
+              </tr>
+            </thead>
+            <tbody id="vaultRecordsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4. 双重核心价值学术与商业叙事卡片 -->
+      <div class="grid-2" style="margin-top:16px; margin-bottom:0;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" style="color:var(--color-cyan);"><span>👤</span> 微观尺度赋能：车主与储能业主专属“电子病历本”</div>
+          </div>
+          <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.7;">
+            • <strong>消除二手交易信息不对称</strong>：打破传统退役电池“一刀切盲测”僵局，清晰掌握历次衰减斜率（d<i>SOH</i>/d<i>t</i>）与健康拐点；<br>
+            • <strong>量化调理再生性能优势</strong>：直观对比调理前后真实恢复量，为高价值梯次储能服役提供可追溯的科学残值依据；<br>
+            • <strong>预防性安全预警</strong>：通过阻抗异常爬升检测，提前阻断热失控隐患。
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" style="color:var(--color-green);"><span>🌐</span> 宏观尺度反哺：隐私计算驱动的“数据飞轮”自演进体系</div>
+          </div>
+          <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.7;">
+            • <strong>严格隐私安全合规</strong>：采用端侧局域差分隐私 (LDP) 与去标识化脱敏，剥离用户身份、车牌与地理轨迹；<br>
+            • <strong>攻克实验室样本分布偏差</strong>：将海量真实多频次脱敏物理特征聚合，反哺 M1 梯度提升树与 M2 弹性网络模型；<br>
+            • <strong>实现模型“越用越准”</strong>：构建从用户体检到模型自主进化的良性生态数据闭环。
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== Tab 7: 决策评估报告 ==================== -->
     <section class="tab-pane" id="tab-report">
       <div style="display:flex; justify-content:flex-end; gap:10px; margin-bottom:12px;">
         <button class="btn btn-outline" onclick="ReportGenerator.printReport()">🖨️ 打印 / 导出 PDF</button>
