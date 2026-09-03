@@ -346,12 +346,12 @@
           <input type="hidden" id="inputEfGrid" value="0.5810">
           <input type="hidden" id="inputCarbonPrice" value="90.0">
 
-          <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="runFullEvaluation()">
+          <button class="btn btn-primary" id="btnRunEvaluate" style="width:100%; margin-top:10px;" onclick="runFullEvaluation(true)">
             <span>⚡</span> 运行全流程智能评估
           </button>
         </div>
 
-        <!-- 右侧：动态仪表盘与决策输出 (支持铁锂实测展示与非铁锂优雅留白) -->
+        <!-- 右侧：动态仪表盘与决策输出 (送检电芯单体实测诊断与微观物理特征解析) -->
         <div style="display:flex; flex-direction:column; gap:16px;" id="dashboardRightWrapper">
           
           <!-- 1. 活跃决策看板（针对已完成全流程标定的体系，如磷酸铁锂） -->
@@ -412,21 +412,18 @@
               </div>
             </div>
 
-            <!-- 储能电池 100 电芯矩阵看板 (随材料体系、标称容量与电压实时自适应重构) -->
-            <div class="pack-matrix-container">
-              <div class="laser-scan-bar"></div>
-              <div class="pack-matrix-header">
-                <div style="font-weight:700; font-size:12px;">
-                  <span>🔋</span> <span id="valPackMatrixHeader">11.20 kWh 储能模组 100 只电芯阵列 (随左侧输入实时自适应)</span>
+            <!-- 送检电芯微观物理机理特征解析 (单电芯实测提取值) -->
+            <div class="card" style="padding:12px 14px;">
+              <div class="card-header" style="margin-bottom:8px;">
+                <div class="card-title" style="font-size:13px;">
+                  <span>🔬</span> <span id="valCellPhysicsTitle">送检电芯微观电化学物理特征解析</span>
                 </div>
-                <div class="pack-legend" id="packLegendCounts">
-                  <div class="legend-item"><span class="legend-color class-a"></span><span id="legendCountA">A级(35)</span></div>
-                  <div class="legend-item"><span class="legend-color class-b"></span><span id="legendCountB">B级(42)</span></div>
-                  <div class="legend-item"><span class="legend-color class-c"></span><span id="legendCountC">C级(17)</span></div>
-                  <div class="legend-item"><span class="legend-color class-d"></span><span id="legendCountD">D级(6)</span></div>
-                </div>
+                <span class="card-title-badge" id="valCellPhysicsBadge" style="color:var(--color-green);">特征工程提取就绪</span>
               </div>
-              <div class="pack-cells-grid" id="packCellsGrid"></div>
+              
+              <div id="cellPhysicsDetailGrid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;">
+                <!-- 动态注入单只电芯的 8 项物理特征与电化学机理说明 -->
+              </div>
             </div>
 
             <!-- 碳减排生态等效看板 -->
@@ -579,6 +576,23 @@
           <span class="card-title-badge">已完成留一验证 (90%置信覆盖)</span>
         </div>
         <div class="chart-container" id="m2ConformalChart"></div>
+      </div>
+
+      <!-- 批量退役电芯 100 只矩阵快筛看板 (批量梯次分选专属) -->
+      <div class="pack-matrix-container" style="margin-bottom:16px;">
+        <div class="laser-scan-bar"></div>
+        <div class="pack-matrix-header">
+          <div style="font-weight:700; font-size:12px;">
+            <span>🔋</span> <span id="valPackMatrixHeader">国家标准储能梯次退役模组 100 只电芯批量阵列 (点击任意电芯可在控制台回放)</span>
+          </div>
+          <div class="pack-legend" id="packLegendCounts">
+            <div class="legend-item"><span class="legend-color class-a"></span><span id="legendCountA">A级(35)</span></div>
+            <div class="legend-item"><span class="legend-color class-b"></span><span id="legendCountB">B级(42)</span></div>
+            <div class="legend-item"><span class="legend-color class-c"></span><span id="legendCountC">C级(17)</span></div>
+            <div class="legend-item"><span class="legend-color class-d"></span><span id="legendCountD">D级(6)</span></div>
+          </div>
+        </div>
+        <div class="pack-cells-grid" id="packCellsGrid"></div>
       </div>
 
       <div class="grid-2-1">

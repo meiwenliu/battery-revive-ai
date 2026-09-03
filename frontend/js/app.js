@@ -234,6 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.requestAnimationFrame(step);
   }
 
+  let isMeasurementDataLoaded = true;
+
   // 8.5 材料体系切换与参数自适应处理器 (实现真实的端到端特征流转与动态响应)
   function handleChemistryChange(updateInputs = true) {
     const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';
@@ -248,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (document.getElementById('inputEfMfg')) document.getElementById('inputEfMfg').value = spec.ef_mfg;
       if (document.getElementById('inputCellId')) document.getElementById('inputCellId').value = `${spec.shortName}-2026-REC-01`;
 
-      // 8 项微观电化学物理特征根据该体系典型真实物理基准同步自适应注入
       const p = spec.default_physics;
       if (p) {
         if (document.getElementById('inputU0')) document.getElementById('inputU0').value = p.u0;
@@ -271,19 +272,24 @@ document.addEventListener('DOMContentLoaded', () => {
       statusBadge.style.color = spec.statusColor;
     }
 
-    // 全体系活跃看板：彻底确保全体系 100% 呈现，无留白无等待
-    const activeBoard = document.getElementById('dashboardActiveContent');
-    if (activeBoard) activeBoard.style.display = 'flex';
-
-    // 依据当前体系重新生成真实的 100 只电芯批量数据与矩阵
+    // 批量分选矩阵随体系自适应
     const curNomCap = parseFloat(document.getElementById('inputNomCap')?.value) || spec.nominal_cap_ah;
     const curVNom = parseFloat(document.getElementById('inputVNom')?.value) || spec.v_nominal;
     batch100 = CalculationEngine.generateBatch100Cells('xgboost', 'elasticnet', chemKey, curNomCap, curVNom);
     renderPackMatrix();
     renderBatchTable();
-
-    // 联动刷新 Tab 4 再利用等级分布环形图与计数
     updateBatchCounts();
+
+    // 真实性判断：若切换到无国家台架标定样本体系 (如硅碳 sic)，没有测量数据就诚实显示待测状态！
+    if (chemKey === 'sic') {
+      isMeasurementDataLoaded = false;
+      renderUnmeasuredState('sic');
+    } else if (updateInputs) {
+      // 切换至有台架标定样本的体系时，自动关联真实标定电芯
+      if (chemKey === 'lfp') loadBenchmarkCell('retire_lfp');
+      else if (chemKey === 'ncm') loadBenchmarkCell('echelon_ncm');
+      else if (chemKey === 'naion') loadBenchmarkCell('naion_proto');
+    }
   }
 
   function updateBatchCounts() {
@@ -308,6 +314,123 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ChartManager.renderBatchDonut('batchDonutChart', counts);
   }
+
+  // 渲染送检单电芯微观物理机理特征解析卡片 (Tab 1 专属)
+  function renderCellPhysicsGrid(p, isMeasured) {
+    const grid = document.getElementById('cellPhysicsDetailGrid');
+    const badge = document.getElementById('valCellPhysicsBadge');
+    if (!grid) return;
+
+    if (!isMeasured || !p) {
+      if (badge) {
+        badge.textContent = '待接入测量时序';
+        badge.style.color = 'var(--color-amber)';
+      }
+      grid.innerHTML = `
+        <div style="grid-column:span 4; padding:16px; text-align:center; background:rgba(255,255,255,0.02); border:1px dashed var(--border-color); border-radius:6px;">
+          <div style="font-size:13px; color:var(--text-secondary); margin-bottom:6px;">⚠️ 当前电芯物理规格已登记，但尚未采集或导入实测脉冲数据</div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">电化学物理机理模型严禁在缺乏真实测量波形时虚构诊断数值。请导入测试文件或调用台架样本。</div>
+          <div style="display:flex; justify-content:center; gap:8px;">
+            <button class="btn btn-outline" style="font-size:11.5px;" onclick="document.getElementById('csvFileInput').click()">📂 导入测试仪脉冲数据 (CSV)</button>
+            <button class="btn btn-primary" style="font-size:11.5px;" onclick="loadBenchmarkForCurrentChem()">⚡ 一键调取本体系台架实测标定电芯</button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if (badge) {
+      badge.textContent = '8项微观物理特征提取完成';
+      badge.style.color = 'var(--color-green)';
+    }
+
+    const items = [
+      { label: '稳态开路电压 U₀', val: `${p.u0} V`, desc: '平衡态自由能基准' },
+      { label: '放电直流内阻 Rdc,dis', val: `${p.rdc_dis} Ω`, desc: '欧姆与电荷转移阻抗' },
+      { label: '充电直流内阻 Rdc,chg', val: `${p.rdc_chg} Ω`, desc: '充电阶段嵌锂阻抗' },
+      { label: '倍率敏感差 ΔRdc', val: `${p.drdc} Ω`, desc: '液相扩散极化敏感度' },
+      { label: '持续极化过电位 η', val: `${p.eta} V`, desc: '相转变反应活化过电位' },
+      { label: '充放不对称度 Asym', val: `${p.asym}`, desc: '去溶剂化能垒不对称性' },
+      { label: '撤载松弛电压 ΔUrelax', val: `${p.relax} V`, desc: '固相离子迟滞松弛' },
+      { label: '库仑效率 CE', val: `${(p.ce * 100).toFixed(2)}%`, desc: '可逆活性锂利用率' }
+    ];
+
+    grid.innerHTML = items.map(item => `
+      <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:6px; padding:8px 10px;">
+        <div style="font-size:11px; color:var(--text-secondary); margin-bottom:2px;">${item.label}</div>
+        <div style="font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:2px;">${item.val}</div>
+        <div style="font-size:10px; color:var(--text-muted);">${item.desc}</div>
+      </div>
+    `).join('');
+  }
+
+  // 科学呈现待测状态 (没有测量数据就诚实显示没有，杜绝PPT式假象)
+  function renderUnmeasuredState(chemKey) {
+    const spec = CalculationEngine.CHEMISTRY_SPECS[chemKey] || CalculationEngine.CHEMISTRY_SPECS.lfp;
+
+    // 数据源溯源条
+    if (document.getElementById('provenanceSourceName')) {
+      document.getElementById('provenanceSourceName').innerHTML = `<span style="color:var(--color-amber);">⚠️ 【${spec.name}】待接入实测脉冲数据</span>`;
+    }
+    if (document.getElementById('provenanceSampling')) {
+      document.getElementById('provenanceSampling').textContent = '未检测到测试台架脉冲信号';
+    }
+    if (document.getElementById('provenanceConfidence')) {
+      document.getElementById('provenanceConfidence').innerHTML = '<span style="color:var(--text-muted);">暂无诊断结论 (无测量不诊断)</span>';
+    }
+
+    // 决策大卡片
+    const decCard = document.getElementById('echelonDecisionCard');
+    if (decCard) {
+      decCard.className = 'tier-decision-card';
+      decCard.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+      decCard.style.background = 'rgba(15, 23, 42, 0.6)';
+    }
+    if (document.getElementById('valEchelonTierTitle')) {
+      document.getElementById('valEchelonTierTitle').textContent = `待测状态：尚未接入【${spec.name}】的实测脉冲时序`;
+    }
+    if (document.getElementById('valEchelonScene')) {
+      document.getElementById('valEchelonScene').textContent = '系统严格遵循国家电化学科研与商业资产公证标准，杜绝在缺乏真实测量数据时凭空生成预测结果；';
+    }
+    if (document.getElementById('valEchelonTreatment')) {
+      document.getElementById('valEchelonTreatment').textContent = '操作建议：请在左侧选择【台架实测标定电芯】或点击【导入测试仪 CSV】启动科学诊断。';
+    }
+    if (document.getElementById('valEchelonEcoValue')) {
+      document.getElementById('valEchelonEcoValue').textContent = '等待测量';
+      document.getElementById('valEchelonEcoValue').style.color = 'var(--text-muted)';
+    }
+
+    // 仪表盘与核心 KPI
+    if (document.getElementById('valSOH')) document.getElementById('valSOH').textContent = '-- %';
+    if (document.getElementById('valQrec')) document.getElementById('valQrec').textContent = '-- Ah';
+    if (document.getElementById('valConformalBound')) document.getElementById('valConformalBound').textContent = '[ 待测 ]';
+    if (document.getElementById('valRPI')) document.getElementById('valRPI').textContent = '-- %';
+    if (document.getElementById('valAfterSOH')) document.getElementById('valAfterSOH').textContent = '-- %';
+    if (document.getElementById('valHealthGrade')) {
+      document.getElementById('valHealthGrade').textContent = '未定级 (等待实测数据驱动)';
+      document.getElementById('valHealthGrade').style.color = 'var(--text-muted)';
+    }
+    ChartManager.renderSohGauge('sohGaugeChart', 0);
+
+    // 单电芯微观物理卡片
+    renderCellPhysicsGrid(null, false);
+
+    // 生态指标
+    if (document.getElementById('valGhgAvoided')) document.getElementById('valGhgAvoided').textContent = '-- kg';
+    if (document.getElementById('valGhgNet')) document.getElementById('valGhgNet').textContent = '-- kg';
+    if (document.getElementById('valCo2Vol')) document.getElementById('valCo2Vol').textContent = '-- m³';
+    if (document.getElementById('valTrees')) document.getElementById('valTrees').textContent = '-- 棵';
+  }
+
+  window.loadBenchmarkForCurrentChem = function() {
+    const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';
+    if (chemKey === 'lfp') loadBenchmarkCell('retire_lfp');
+    else if (chemKey === 'ncm') loadBenchmarkCell('echelon_ncm');
+    else if (chemKey === 'naion') loadBenchmarkCell('naion_proto');
+    else {
+      alert('当前材料体系尚未在国家测试台架完成全周期标定，请通过【📂 导入测试仪 CSV】接入真实测量时序数据。');
+    }
+  };
 
   // 8.6 真实测量数据源调度器 (解决“改了左侧没有类似数据、非测量不能诊断”的科学性痛点)
   window.loadBenchmarkCell = function(key) {
@@ -465,9 +588,18 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // 9. 全流程计算与视图更新 (实现各模块随前序体系与参数的全动态联动)
-  window.runFullEvaluation = function() {
+  window.runFullEvaluation = function(isExplicit = false) {
     const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';
     const spec = CalculationEngine.CHEMISTRY_SPECS[chemKey] || CalculationEngine.CHEMISTRY_SPECS.lfp;
+
+    if (isExplicit) {
+      isMeasurementDataLoaded = true;
+    }
+
+    if (!isMeasurementDataLoaded) {
+      renderUnmeasuredState(chemKey);
+      return;
+    }
 
     const u0 = parseFloat(document.getElementById('inputU0').value) || spec.default_physics.u0;
     const rdc_dis = parseFloat(document.getElementById('inputRdcDis').value) || spec.default_physics.rdc_dis;
@@ -491,6 +623,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const selM1 = document.getElementById('selM1Model')?.value || 'xgboost';
     const selM2 = document.getElementById('selM2Model')?.value || 'elasticnet';
+
+    // 渲染送检单电芯 8 项微观物理机理特征卡片 (Tab 1 专属)
+    const p = { u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, ce };
+    renderCellPhysicsGrid(p, true);
 
     // 1. M1 SOH 诊断 (动态传入 chemKey, q_dis, nom_cap，自适应体系物理基准与真实容量状态)
     const m1Res = CalculationEngine.predictSOH(u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, soc, selM1, chemKey, q_dis, nom_cap);
@@ -577,20 +713,26 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // 5. M3 碳量化（完全依据当前体系真实的额定容量、电压与碳排因子动态核算）
+    // 5. M3 碳量化（单体送检电芯 + 批量模组自适应核算）
+    const singleCellKwh = +(nom_cap * v_nom / 1000).toFixed(3);
     const packKwh = +(nom_cap * v_nom * 100 / 1000).toFixed(2);
     document.getElementById('inputPackKwh').value = packKwh;
     const efMfg = parseFloat(document.getElementById('inputEfMfg').value) || spec.ef_mfg;
     const efGrid = parseFloat(document.getElementById('inputEfGrid').value) || 0.5810;
     const nCells = parseInt(document.getElementById('inputBatchCount').value) || 1;
 
+    // 单只送检电芯制造端碳减排规避量 (呈现于 Tab 1 单体诊断看板)
+    const singleCarb = CalculationEngine.calculateCarbon(m2Res.recovery_fraction_pct / 100.0, singleCellKwh, 1, efMfg, efGrid, 0.05);
+    document.getElementById('valGhgAvoided').textContent = singleCarb.ghg_avoided_kg + ' kg';
+    document.getElementById('valGhgNet').textContent = singleCarb.ghg_net_kg + ' kg';
+    document.getElementById('valCo2Vol').textContent = singleCarb.co2_volume_m3 + ' m³';
+    document.getElementById('valTrees').textContent = singleCarb.trees_equivalent_count + ' 棵';
+    if (document.getElementById('valEcoHeader')) {
+      document.getElementById('valEcoHeader').textContent = `送检电芯制造端碳减排规避成果 (${singleCellKwh} kWh 单体等效)`;
+    }
+
+    // 批量 100 只电芯梯次利用碳减排量 (呈现于 Tab 4 与 Tab 5 批量核算)
     const carbRes = CalculationEngine.calculateCarbon(m2Res.recovery_fraction_pct / 100.0, packKwh, nCells, efMfg, efGrid, 0.85);
-    
-    // 看板与 KPI 动态更新
-    document.getElementById('valGhgAvoided').textContent = carbRes.ghg_avoided_kg + ' kg';
-    document.getElementById('valGhgNet').textContent = carbRes.ghg_net_kg + ' kg';
-    document.getElementById('valCo2Vol').textContent = carbRes.co2_volume_m3 + ' m³';
-    document.getElementById('valTrees').textContent = carbRes.trees_equivalent_count + ' 棵';
     if (document.getElementById('dashKpiGhg')) {
       document.getElementById('dashKpiGhg').textContent = carbRes.ghg_avoided_kg;
     }
@@ -628,10 +770,7 @@ document.addEventListener('DOMContentLoaded', () => {
     batch100 = CalculationEngine.generateBatch100Cells(selM1, selM2, chemKey, nom_cap, v_nom);
     
     const headerEl = document.getElementById('valPackMatrixHeader');
-    if (headerEl) headerEl.textContent = `${packKwh} kWh 储能模组 100 只电芯阵列 (${spec.name.split(' ')[0]} ${nom_cap}Ah · 实时自适应)`;
-    
-    const ecoHeaderEl = document.getElementById('valEcoHeader');
-    if (ecoHeaderEl) ecoHeaderEl.textContent = `制造端碳减排规避量化成果 (${packKwh} kWh 模组等效)`;
+    if (headerEl) headerEl.textContent = `${packKwh} kWh 储能模组 100 只电芯阵列 (${spec.name.split(' ')[0]} ${nom_cap}Ah · 批量梯次利用)`;
 
     renderPackMatrix();
     renderBatchTable();
@@ -673,7 +812,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('selM2Model')?.addEventListener('change', () => runFullEvaluation());
   document.getElementById('selBatteryChemistry')?.addEventListener('change', () => {
     handleChemistryChange(true);
-    runFullEvaluation();
   });
 
   // 监听电压截止、标称容量及全部 8 项微观电化学物理特征的手动修改联动
@@ -681,7 +819,11 @@ document.addEventListener('DOMContentLoaded', () => {
     'inputNomCap', 'inputVNom', 'inputVChgCut', 'inputVDisCut', 'inputQDis', 'inputCE', 'inputEE', 'inputCellId',
     'inputU0', 'inputRdcDis', 'inputRdcChg', 'inputDrdc', 'inputEta', 'inputAsym', 'inputRelax', 'inputSOC', 'inputEfMfg'
   ].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', () => runFullEvaluation());
+    document.getElementById(id)?.addEventListener('input', () => {
+      if (isMeasurementDataLoaded) {
+        runFullEvaluation();
+      }
+    });
   });
 
   // 11. 样例快捷载入 (完全就地载入，绝不切页)
