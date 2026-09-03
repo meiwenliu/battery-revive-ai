@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>焕芯·电愈智策——多体系电池智能快速诊断与低碳循环决策系统</title>
+  
+  <!-- CSS 样式引入 -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <!-- 本地离线优先引入 ECharts 5.4.3 -->
+  <script src="js/echarts.min.js"></script>
+  <script>
+    if (typeof echarts === 'undefined') {
+      document.write('<script src="https://registry.npmmirror.com/echarts/5.4.3/files/dist/echarts.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- 1. 顶部全局导航栏 -->
+  <header class="navbar">
+    <div class="brand-wrapper">
+      <div class="brand-logo">焕</div>
+      <div class="brand-text">
+        <h1>焕芯·电愈智策</h1>
+        <p>多材料体系·储能与循环电池智能快速诊断、容量恢复预估与低碳再生决策系统</p>
+      </div>
+    </div>
+    
+    <div class="nav-status-group">
+      <!-- 主题切换药丸组 -->
+      <div class="theme-switch-group">
+        <button class="btn-theme-pill active" data-theme="dark">🌙 深空黑</button>
+        <button class="btn-theme-pill" data-theme="light">☀️ 象牙白</button>
+        <button class="btn-theme-pill" data-theme="aurora">🌌 极光蓝</button>
+      </div>
+
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span>16通道直连中</span>
+      </div>
+      <div class="system-clock" id="systemClock">00:00:00</div>
+    </div>
+  </header>
+
+  <!-- 2. 全流程六阶微观-宏观数字孪生流路导航卡 -->
+  <div class="pipeline-flow-bar">
+    <div class="pipeline-step active" data-tab-target="tab-realtime">
+      <span class="pipeline-step-num">1</span>
+      <span>实时脉冲采集</span>
+    </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="pipeline-step" data-tab-target="tab-m1">
+      <span class="pipeline-step-num">2</span>
+      <span>8项物理特征提取</span>
+    </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="pipeline-step" data-tab-target="tab-m1">
+      <span class="pipeline-step-num">3</span>
+      <span>SOH 智能诊断</span>
+    </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="pipeline-step" data-tab-target="tab-m2">
+      <span class="pipeline-step-num">4</span>
+      <span>容量恢复预测</span>
+    </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="pipeline-step" data-tab-target="tab-m2">
+      <span class="pipeline-step-num">5</span>
+      <span>四级分选决策</span>
+    </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="pipeline-step" data-tab-target="tab-m3">
+      <span class="pipeline-step-num">6</span>
+      <span>制造端碳减排量化</span>
+    </div>
+  </div>
+
+  <!-- 3. 主模块标签页切换 (清晰、直观、按需切换) -->
+  <nav class="nav-tabs">
+    <button class="nav-tab-btn active" data-tab="tab-dashboard">
+      <span>📊</span> 全流程工作台
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-realtime">
+      <span>⚡</span> 实时测试示波器
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-m1">
+      <span>🔍</span> SOH 健康诊断 (M1)
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-m2">
+      <span>🔄</span> 容量恢复与再生定级 (M2)
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-m3">
+      <span>🌱</span> 制造端碳减排 (M3)
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-report">
+      <span>📑</span> 决策评估报告
+    </button>
+  </nav>
+
+  <!-- 4. 标准样例快捷栏与全体系支持提示 -->
+  <aside class="sample-bar">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="color:var(--color-green); font-weight:700;">★ 示例样本：</span>
+    </div>
+    <div class="sample-actions">
+      <button class="btn-sample" onclick="loadPresetSample('pulsebat')">① 35Ah 脉冲极速诊断样本 (50% SOC)</button>
+      <button class="btn-sample" onclick="loadPresetSample('recovery62')">② 18650 循环恢复样本 (22只典型电芯)</button>
+      <button class="btn-sample" onclick="loadPresetSample('echelon_batch')">③ 100只批量电芯性能分选批次</button>
+      <a href="../data/data_dictionary.md" target="_blank" class="btn-sample" style="color:var(--color-amber);">📖 数据字典说明</a>
+    </div>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-secondary);">
+      <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--color-brand);"></span>
+      <span>兼容 LFP / 三元 / 钠电等全材料体系 · 覆盖工商业与电网储能等全场景</span>
+    </div>
+  </aside>
+
+  <!-- 5. 主内容容器 -->
+  <main class="main-container">
+
+    <!-- ==================== Tab 1: 全流程决策工作台 (纯粹的就地工作台，杜绝乱跳转) ==================== -->
+    <section class="tab-pane active" id="tab-dashboard">
+      
+      <!-- 4 大核心 KPI 汇总 -->
+      <div class="grid-4">
+        <div class="kpi-card green">
+          <div class="kpi-label">SOH 诊断模型 (M1)</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="dashKpiSohMae" style="font-size:18px;">统一 XGBoost</span>
+            <span class="kpi-unit" id="dashKpiSohUnit">[推荐]</span>
+          </div>
+          <div class="kpi-badge success" id="badgeSelectedM1">推荐算法</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">容量恢复预测模型 (M2)</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="dashKpiQrecMae" style="font-size:18px;">弹性网络 (ElasticNet)</span>
+            <span class="kpi-unit" id="dashKpiQrecUnit">[推荐]</span>
+          </div>
+          <div class="kpi-badge info" id="badgeSelectedM2">推荐算法</div>
+        </div>
+
+        <div class="kpi-card amber">
+          <div class="kpi-label">高价值分选率 (A/B级)</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value">79.0</span>
+            <span class="kpi-unit">% (储能/备电)</span>
+          </div>
+          <div class="kpi-badge warning">残值提升 +25%</div>
+        </div>
+
+        <div class="kpi-card blue">
+          <div class="kpi-label">制造端碳规避潜力 (M3)</div>
+          <div class="kpi-value-row">
+            <span class="kpi-value" id="dashKpiGhg">420.36</span>
+            <span class="kpi-unit">kgCO₂e / 包</span>
+          </div>
+          <div class="kpi-badge info">等效植树 23.1 棵</div>
+        </div>
+      </div>
+
+      <!-- 全流程主工作区 -->
+      <div class="grid-1-2">
+        
+        <!-- 左侧：参数控制台与抽屉 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🎛️</span> 模型选择与极速诊断输入
+            </div>
+            <span class="card-title-badge">双模型独立配置</span>
+          </div>
+
+          <!-- 模型自主选择 -->
+          <div class="form-group">
+            <label class="form-label" style="color:var(--color-brand); font-weight:700;">🧠 SOH 诊断模型选择</label>
+            <select class="form-select" id="selM1Model">
+              <option value="xgboost">统一梯度提升决策树 (XGBoost) [推荐]</option>
+              <option value="random_forest">随机森林回归 (Random Forest)</option>
+              <option value="ridge">岭回归 (Ridge Regression)</option>
+              <option value="pls">偏最小二乘 (PLS)</option>
+              <option value="svr">支持向量机 (SVR)</option>
+              <option value="mean_baseline">均值基线 (对照)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="color:var(--color-green); font-weight:700;">🧠 容量恢复预测模型</label>
+            <select class="form-select" id="selM2Model">
+              <option value="elasticnet">弹性网络回归 (ElasticNet) [推荐]</option>
+              <option value="linear">多元线性回归 (Linear)</option>
+              <option value="lasso">套索回归 (Lasso)</option>
+              <option value="gpr">高斯过程回归 (GPR)</option>
+              <option value="mean_baseline">历史均值基线 (对照)</option>
+            </select>
+          </div>
+
+          <!-- 材料体系选择 -->
+          <div class="form-group">
+            <label class="form-label" style="color:var(--color-cyan); font-weight:700; margin-bottom:4px;">🔬 材料体系选择</label>
+            <select class="form-select" id="selBatteryChemistry">
+              <option value="lfp" selected>磷酸铁锂 (LFP) 体系</option>
+              <option value="ncm">三元高镍 (NCM / NCA) 体系</option>
+              <option value="naion">钠离子电池 (Na-ion) 体系</option>
+              <option value="sic">硅碳复合体系 (NCM-SiC)</option>
+            </select>
+          </div>
+
+          <!-- 电压工作窗口与容量规格配置组 (MathType 规范排版) -->
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:6px; padding:10px; margin-bottom:12px;">
+            <div style="margin-bottom:8px;">
+              <span style="font-size:11.5px; font-weight:700; color:var(--text-secondary);">⚙️ 电芯工作电压窗口与标称容量</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group" style="margin-bottom:6px;">
+                <label class="form-label" style="font-size:11px;">标称容量 <i>C</i><sub>nom</sub> (Ah)</label>
+                <input type="number" step="0.1" class="form-input" id="inputNomCap" value="35.0">
+              </div>
+              <div class="form-group" style="margin-bottom:6px;">
+                <label class="form-label" style="font-size:11px;">标称工作电压 <i>U</i><sub>nom</sub> (V)</label>
+                <input type="number" step="0.05" class="form-input" id="inputVNom" value="3.20">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:11px;">充电截止 <i>U</i><sub>chg,cut</sub> (V)</label>
+                <input type="number" step="0.05" class="form-input" id="inputVChgCut" value="3.65">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:11px;">放电截止 <i>U</i><sub>dis,cut</sub> (V)</label>
+                <input type="number" step="0.05" class="form-input" id="inputVDisCut" value="2.50">
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="form-group">
+              <label class="form-label">电芯编号 ID</label>
+              <input type="text" class="form-input" id="inputCellId" value="BAT-2026-REC-01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">放电容量 <i>Q</i><sub>dis</sub> (Ah)</label>
+              <input type="number" step="0.001" class="form-input" id="inputQDis" value="27.65">
+            </div>
+          </div>
+
+          <!-- 折叠抽屉：8 项微观电化学物理特征 (MathType 排版) -->
+          <div class="accordion-toggle" id="accordionToggleBtn" onclick="toggleAccordion('accordionPhysics')">
+            <span>⚙️ 展开 8 项微观物理特征 (<i>U</i><sub>0</sub>, <i>R</i><sub>dc</sub>, <i>η</i>, ...)</span>
+            <span>▼</span>
+          </div>
+
+          <div class="accordion-content" id="accordionPhysics">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <div class="form-group">
+                <label class="form-label">开路电压 <i>U</i><sub>0</sub> (V)</label>
+                <input type="number" step="0.001" class="form-input" id="inputU0" value="3.3116">
+              </div>
+              <div class="form-group">
+                <label class="form-label">放电直流阻抗 <i>R</i><sub>dc,dis</sub> (Ω)</label>
+                <input type="number" step="0.0001" class="form-input" id="inputRdcDis" value="0.0124">
+              </div>
+              <div class="form-group">
+                <label class="form-label">充电直流阻抗 <i>R</i><sub>dc,chg</sub> (Ω)</label>
+                <input type="number" step="0.0001" class="form-input" id="inputRdcChg" value="0.0138">
+              </div>
+              <div class="form-group">
+                <label class="form-label">倍率阻抗差 Δ<i>R</i><sub>dc</sub> (Ω)</label>
+                <input type="number" step="0.0001" class="form-input" id="inputDrdc" value="-0.0026">
+              </div>
+              <div class="form-group">
+                <label class="form-label">极化过电位 <i>η</i> (V)</label>
+                <input type="number" step="0.001" class="form-input" id="inputEta" value="-0.0273">
+              </div>
+              <div class="form-group">
+                <label class="form-label">充放不对称度 <i>A</i><sub>sym</sub></label>
+                <input type="number" step="0.001" class="form-input" id="inputAsym" value="-0.0521">
+              </div>
+              <div class="form-group">
+                <label class="form-label">弛豫电压 Δ<i>U</i><sub>relax</sub> (V)</label>
+                <input type="number" step="0.001" class="form-input" id="inputRelax" value="0.0537">
+              </div>
+              <div class="form-group">
+                <label class="form-label">荷电状态 SOC (%)</label>
+                <input type="number" step="1" class="form-input" id="inputSOC" value="50">
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="form-group">
+              <label class="form-label">库仑效率 CE</label>
+              <input type="number" step="0.0001" class="form-input" id="inputCE" value="0.9842">
+            </div>
+            <div class="form-group">
+              <label class="form-label">能量效率 EE</label>
+              <input type="number" step="0.0001" class="form-input" id="inputEE" value="0.8950">
+            </div>
+          </div>
+
+          <!-- 隐藏场景因子默认值 -->
+          <input type="hidden" id="inputVMean" value="3.195">
+          <input type="hidden" id="inputVHyst" value="0.1420">
+          <input type="hidden" id="inputPackKwh" value="60.48">
+          <input type="hidden" id="inputBatchCount" value="1">
+          <input type="hidden" id="inputEfMfg" value="105.0">
+          <input type="hidden" id="inputEfGrid" value="0.5810">
+          <input type="hidden" id="inputCarbonPrice" value="90.0">
+
+          <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="runFullEvaluation()">
+            <span>⚡</span> 运行全流程智能评估
+          </button>
+        </div>
+
+        <!-- 右侧：动态仪表盘与决策输出 (支持铁锂实测展示与非铁锂优雅留白) -->
+        <div style="display:flex; flex-direction:column; gap:16px;" id="dashboardRightWrapper">
+          
+          <!-- 1. 活跃决策看板（针对已完成全流程标定的体系，如磷酸铁锂） -->
+          <div id="dashboardActiveContent" style="display:flex; flex-direction:column; gap:16px;">
+            
+            <!-- 四级分选决策大卡片 -->
+            <div class="tier-decision-card class-b" id="echelonDecisionCard">
+              <div class="tier-info">
+                <h3 id="valEchelonTierTitle">B 级：深度调理再生 + 储能/高敏备电应用</h3>
+                <p id="valEchelonScene">场景：工商业与户用储能 · 5G 通信基站备电 · 离网微电网储能</p>
+                <p style="margin-top:2px;" id="valEchelonTreatment">建议：执行 3.6V 恒压充电微调理激活活性锂</p>
+              </div>
+              <div class="tier-badge-large" id="valEchelonEcoValue" style="color:var(--color-brand);">
+                残值提升 +25%
+              </div>
+            </div>
+
+            <!-- 动态发光能量环表盘 + 核心指标 -->
+            <div class="grid-2-1" style="margin-bottom:0;">
+              <div class="card" style="padding:10px;">
+                <div class="card-title" style="font-size:12px; margin-bottom:0;">
+                  <span>⏱️</span> SOH 动态健康能量表
+                </div>
+                <div class="chart-container short" id="sohGaugeChart" style="height:150px;"></div>
+                <div style="text-align:center; font-size:11.5px; font-weight:700; color:var(--text-secondary);" id="valHealthGrade">良好 (二级健康)</div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="card" style="padding:8px 10px;">
+                  <div style="font-size:10.5px; color:var(--text-secondary);">初始 SOH (M1)</div>
+                  <div style="font-size:19px; font-weight:800; color:var(--color-brand);" id="valSOH">75.40%</div>
+                </div>
+                <div class="card" style="padding:8px 10px;">
+                  <div style="font-size:10.5px; color:var(--text-secondary);">恢复量 Q_rec (M2)</div>
+                  <div style="font-size:19px; font-weight:800; color:var(--color-cyan);" id="valQrec">0.1629 Ah</div>
+                  <div style="font-size:9.5px; color:var(--text-muted);" id="valConformalBound">[0.10~0.22]</div>
+                </div>
+                <div class="card" style="padding:8px 10px;">
+                  <div style="font-size:10.5px; color:var(--text-secondary);">恢复潜力 RPI</div>
+                  <div style="font-size:19px; font-weight:800; color:var(--color-amber);" id="valRPI">16.80%</div>
+                </div>
+                <div class="card" style="padding:8px 10px;">
+                  <div style="font-size:10.5px; color:var(--text-secondary);">调理后预期 SOH</div>
+                  <div style="font-size:19px; font-weight:800; color:var(--color-green);" id="valAfterSOH">82.20%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 60.48 kWh 储能电池 100 电芯矩阵看板 (点击任意电芯立即在上方表盘显示，绝不跳页) -->
+            <div class="pack-matrix-container">
+              <div class="laser-scan-bar"></div>
+              <div class="pack-matrix-header">
+                <div style="font-weight:700; font-size:12px;">
+                  <span>🔋</span> 60.48 kWh 标准储能电池模组 100 只电芯阵列 (点击任意电芯即时在上方表盘更新)
+                </div>
+                <div class="pack-legend">
+                  <div class="legend-item"><span class="legend-color class-a"></span>A级(38)</div>
+                  <div class="legend-item"><span class="legend-color class-b"></span>B级(41)</div>
+                  <div class="legend-item"><span class="legend-color class-c"></span>C级(15)</div>
+                  <div class="legend-item"><span class="legend-color class-d"></span>D级(6)</div>
+                </div>
+              </div>
+              <div class="pack-cells-grid" id="packCellsGrid"></div>
+            </div>
+
+            <!-- 碳减排生态等效看板 -->
+            <div class="card" style="padding:12px 14px;">
+              <div class="card-header" style="margin-bottom:8px;">
+                <div class="card-title" style="font-size:13px;">
+                  <span>🌱</span> 制造端碳减排规避量化成果 (60.48 kWh 包等效)
+                </div>
+              </div>
+              
+              <div class="eco-grid" style="margin-top:0;">
+                <div class="eco-item">
+                  <div class="eco-icon">🏭</div>
+                  <div class="eco-num" id="valGhgAvoided">420.36 kg</div>
+                  <div class="eco-desc">制造端规避量</div>
+                </div>
+                <div class="eco-item">
+                  <div class="eco-icon">📉</div>
+                  <div class="eco-num" id="valGhgNet">415.42 kg</div>
+                  <div class="eco-desc">净碳减排量</div>
+                </div>
+                <div class="eco-item">
+                  <div class="eco-icon">🫧</div>
+                  <div class="eco-num" id="valCo2Vol">230.79 m³</div>
+                  <div class="eco-desc">常压 CO₂ 体积</div>
+                </div>
+                <div class="eco-item">
+                  <div class="eco-icon">🌲</div>
+                  <div class="eco-num" id="valTrees">23.1 棵</div>
+                  <div class="eco-desc">年吸收碳汇</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 2. 待接入体系专属留白状态卡片（当用户切换到其他体系时干净留白） -->
+          <div id="dashboardPendingBlankState" style="display:none; flex-direction:column; gap:16px;">
+            <div class="card" style="padding:40px 24px; text-align:center; min-height:500px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px dashed rgba(0, 229, 255, 0.35); background:radial-gradient(ellipse at center, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 29, 0.98) 100%);">
+              <div style="width:72px; height:72px; border-radius:50%; background:rgba(0, 229, 255, 0.1); display:flex; align-items:center; justify-content:center; font-size:34px; margin-bottom:18px; border:1px solid rgba(0, 229, 255, 0.35); box-shadow:0 0 28px rgba(0, 229, 255, 0.2);">
+                🔬
+              </div>
+              <h3 id="blankStateChemTitle" style="font-size:19px; font-weight:800; color:var(--color-cyan); margin-bottom:10px;">【三元高镍体系】</h3>
+              <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.8; max-width:540px; margin:0 auto 24px;">
+                当前所选材料体系暂无测试样本接入，右侧决策看板保持留白。<br>
+                您可以在左侧调整电芯参数，或切回磷酸铁锂体系查看完整决策看板。
+              </p>
+              <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:6px; padding:12px 20px; margin-bottom:24px; font-size:12.5px; color:var(--text-muted); display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+                <span>标称电压 <i>U</i><sub>nom</sub>：<strong id="blankStateVNom" style="color:var(--text-primary);">3.70 V</strong></span>
+                <span>充电截止 <i>U</i><sub>chg,cut</sub>：<strong id="blankStateVChg" style="color:var(--text-primary);">4.20 V</strong></span>
+                <span>放电截止 <i>U</i><sub>dis,cut</sub>：<strong id="blankStateVDis" style="color:var(--text-primary);">2.80 V</strong></span>
+                <span>标称容量 <i>C</i><sub>nom</sub>：<strong id="blankStateNomCap" style="color:var(--text-primary);">50.0 Ah</strong></span>
+              </div>
+              <button class="btn btn-primary" onclick="switchToVerifiedLFP()" style="padding:10px 24px; font-size:13.5px;">
+                ⚡ 切换至【磷酸铁锂 (LFP)】查看完整决策看板
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================== Tab 2: 实时测试直连与示波器 ==================== -->
+    <section class="tab-pane" id="tab-realtime">
+      <div class="grid-1-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>🔌</span> 16 通道测试状态</div>
+          </div>
+
+          <div class="channel-grid">
+            <button class="channel-btn active testing" data-ch="CH01">CH01</button>
+            <button class="channel-btn testing" data-ch="CH02">CH02</button>
+            <button class="channel-btn testing" data-ch="CH03">CH03</button>
+            <button class="channel-btn testing" data-ch="CH04">CH04</button>
+            <button class="channel-btn" data-ch="CH05">CH05</button>
+            <button class="channel-btn" data-ch="CH06">CH06</button>
+            <button class="channel-btn" data-ch="CH07">CH07</button>
+            <button class="channel-btn" data-ch="CH08">CH08</button>
+            <button class="channel-btn" data-ch="CH09">CH09</button>
+            <button class="channel-btn" data-ch="CH10">CH10</button>
+            <button class="channel-btn" data-ch="CH11">CH11</button>
+            <button class="channel-btn" data-ch="CH12">CH12</button>
+            <button class="channel-btn" data-ch="CH13">CH13</button>
+            <button class="channel-btn" data-ch="CH14">CH14</button>
+            <button class="channel-btn" data-ch="CH15">CH15</button>
+            <button class="channel-btn" data-ch="CH16">CH16</button>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="btn btn-primary" style="flex:1;" id="btnToggleOsc">暂停示波器</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="loadPresetSample('pulsebat')">标准脉冲</button>
+          </div>
+
+          <div style="margin-top:12px; border-top:1px solid var(--border-color); padding-top:10px;">
+            <div class="card-title" style="font-size:12px; margin-bottom:6px;"><span>⚡</span> 脉冲激励注入</div>
+            <div class="pulse-injection-bar">
+              <button class="btn-pulse" onclick="injectPulse('chg_05c')">+0.5C 充电</button>
+              <button class="btn-pulse" onclick="injectPulse('dis_10c')">-1.0C 放电</button>
+              <button class="btn-pulse" onclick="injectPulse('dis_20c')">-2.0C 脉冲</button>
+              <button class="btn-pulse" onclick="injectPulse('relax')">撤载松弛</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>📈</span> 双通道实时示波器 (Trace-V 电压 & Trace-I 电流)</div>
+            <span class="card-title-badge">60 FPS</span>
+          </div>
+
+          <div class="oscilloscope-box">
+            <div class="oscilloscope-hud" id="oscilloscopeHud">
+              <span>通道: <strong>CH01</strong></span>
+              <span>Trace-V: <strong>3.2950 V</strong></span>
+              <span>Trace-I: <strong>0.00 A</strong></span>
+            </div>
+            <canvas class="oscilloscope-canvas" id="realtimeCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== Tab 3: SOH 健康诊断 (M1) ==================== -->
+    <section class="tab-pane" id="tab-m1">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>🧬</span> 物理特征重要性得分</div>
+          </div>
+          <div class="chart-container tall" id="m1FeatureChart"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>⚖️</span> 多模型 LOBO 误差横向对比</div>
+          </div>
+          <div class="chart-container tall" id="m1ModelCompareChart"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header">
+          <div class="card-title"><span>📑</span> 多模型横向预测对照矩阵</div>
+        </div>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>算法模型</th>
+              <th>预测 SOH</th>
+              <th>健康等级</th>
+              <th>LOBO 误差</th>
+            </tr>
+          </thead>
+          <tbody id="multiModelCompareBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== Tab 4: 容量恢复与再生定级 (M2) ==================== -->
+    <section class="tab-pane" id="tab-m2">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <div class="card-title"><span>🎯</span> 22 只典型循环电芯恢复预测值与 90% 保角区间</div>
+          <span class="card-title-badge">已完成留一验证 (90%置信覆盖)</span>
+        </div>
+        <div class="chart-container" id="m2ConformalChart"></div>
+      </div>
+
+      <div class="grid-2-1">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>📋</span> 100 只批量电芯循环再生分选明细</div>
+            <button class="btn btn-success" style="padding:3px 10px; font-size:11.5px;" onclick="exportBatchCSV()">📥 导出 CSV</button>
+          </div>
+
+          <div class="batch-filter-bar">
+            <div class="filter-pills">
+              <button class="filter-pill active" data-filter="ALL">全部(100)</button>
+              <button class="filter-pill" data-filter="CLASS_A">A级(38)</button>
+              <button class="filter-pill" data-filter="CLASS_B">B级(41)</button>
+              <button class="filter-pill" data-filter="CLASS_C">C级(15)</button>
+              <button class="filter-pill" data-filter="CLASS_D">D级(6)</button>
+            </div>
+          </div>
+
+          <div style="max-height:280px; overflow-y:auto;">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>编号</th>
+                  <th>SOH</th>
+                  <th>容量</th>
+                  <th>恢复量</th>
+                  <th>RPI</th>
+                  <th>评级</th>
+                  <th>净减排</th>
+                </tr>
+              </thead>
+              <tbody id="batchTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>🍩</span> 再利用等级分布占比</div>
+          </div>
+          <div class="chart-container" id="batchDonutChart"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== Tab 5: 制造端碳减排 (M3) ==================== -->
+    <section class="tab-pane" id="tab-m3">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>🌱</span> 制造端碳减排链路明细</div>
+          </div>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>核算环节</th>
+                <th>数值</th>
+                <th>排放贡献</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>恢复电量</td>
+                <td>6.568 kWh</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>制造端规避量</td>
+                <td>105 kgCO₂e/kWh</td>
+                <td><strong style="color:var(--color-green);">+420.36 kg</strong></td>
+              </tr>
+              <tr>
+                <td>调理电网电耗</td>
+                <td>8.50 kWh</td>
+                <td><strong style="color:var(--color-rose);">-4.94 kg</strong></td>
+              </tr>
+              <tr style="background:rgba(16,185,129,0.12);">
+                <td><strong>净碳减排量</strong></td>
+                <td><strong>6.568 kWh 洁净电量</strong></td>
+                <td><strong style="color:var(--color-brand); font-size:15px;">415.42 kgCO₂e</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span>📊</span> 全生命周期碳减排瀑布分解</div>
+          </div>
+          <div class="chart-container short" id="carbonWaterfallChart"></div>
+          <div style="background:var(--bg-secondary); padding:10px; border-radius:6px; border:1px solid var(--border-color); margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11.5px;">🌿 单位储能量净减碳强度</span>
+              <strong style="color:var(--color-green); font-size:13px;" id="valCarbonIntensity">6.87 kgCO₂e / kWh</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== Tab 6: 决策评估报告 ==================== -->
+    <section class="tab-pane" id="tab-report">
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-bottom:12px;">
+        <button class="btn btn-outline" onclick="ReportGenerator.printReport()">🖨️ 打印 / 导出 PDF</button>
+        <button class="btn btn-success" onclick="exportBatchCSV()">📥 导出 CSV 明细</button>
+      </div>
+
+      <div id="reportContainer"></div>
+    </section>
+
+  </main>
+
+  <!-- JS 脚本引入 -->
+  <script src="js/calculation_engine.js?v=20260831_v3"></script>
+  <script src="js/realtime_stream.js"></script>
+  <script src="js/charts.js?v=20260831_v3"></script>
+  <script src="js/report_generator.js"></script>
+  <script src="js/app.js?v=20260831_v3"></script>
+</body>
+</html>

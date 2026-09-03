@@ -1,0 +1,454 @@
+/* ==========================================================================
+   组件库：激光扫描、参数折叠抽屉、动态仪表盘、分级决策大卡 (Phase 3)
+   ========================================================================== */
+
+/* 1. 参数折叠抽屉 */
+.accordion-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 10px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-brand);
+  transition: all 0.2s;
+}
+
+.accordion-toggle:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--color-brand);
+}
+
+.accordion-content {
+  display: none;
+  padding: 10px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.accordion-content.open {
+  display: block;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* 2. 60.48 kWh 电池包 100 电芯矩阵看板 + 动态激光扫掠线 */
+.pack-matrix-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 动态激光扫描线动画 */
+.laser-scan-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-brand), transparent);
+  box-shadow: 0 0 12px var(--color-brand);
+  opacity: 0.8;
+  animation: laser-sweep 4s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes laser-sweep {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 0.9; }
+  90% { opacity: 0.9; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.pack-matrix-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.pack-legend {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.legend-color {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.legend-color.class-a { background: var(--color-green); }
+.legend-color.class-b { background: var(--color-cyan); }
+.legend-color.class-c { background: var(--color-amber); }
+.legend-color.class-d { background: var(--color-rose); }
+
+.pack-cells-grid {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 4px;
+  padding: 6px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+}
+
+.cell-chip {
+  aspect-ratio: 1.1;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.cell-chip:hover {
+  transform: scale(1.35);
+  z-index: 50;
+  box-shadow: 0 0 10px #FFFFFF;
+}
+
+.cell-chip.class-a { background: var(--color-green); }
+.cell-chip.class-b { background: var(--color-cyan); }
+.cell-chip.class-c { background: var(--color-amber); }
+.cell-chip.class-d { background: var(--color-rose); }
+
+/* 3. 示波器容器 */
+.oscilloscope-box {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: #02050E;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.oscilloscope-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.oscilloscope-hud {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 11px;
+  color: #00E5FF;
+  pointer-events: none;
+  display: flex;
+  gap: 12px;
+  background: rgba(2, 5, 14, 0.85);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+}
+
+.pulse-injection-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-pulse {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.btn-pulse:hover {
+  background: var(--color-brand);
+  color: #FFFFFF;
+}
+
+/* 4. 16 通道选择器网格 */
+.channel-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.channel-btn {
+  padding: 5px 3px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-size: 10.5px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.channel-btn.active {
+  background: var(--color-brand);
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.channel-btn.testing {
+  border-left: 3px solid var(--color-green);
+}
+
+/* 5. 四级分选决策大卡片 */
+.tier-decision-card {
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-card);
+}
+
+.tier-decision-card.class-a {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: var(--color-green);
+}
+
+.tier-decision-card.class-b {
+  background: rgba(6, 182, 212, 0.12);
+  border-color: var(--color-cyan);
+}
+
+.tier-decision-card.class-c {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: var(--color-amber);
+}
+
+.tier-decision-card.class-d {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: var(--color-rose);
+}
+
+.tier-info h3 {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 3px;
+  color: var(--text-primary);
+}
+
+.tier-info p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.tier-badge-large {
+  font-size: 18px;
+  font-weight: 900;
+  padding: 5px 14px;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+/* 6. 碳排生态等效四宫格 */
+.eco-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.eco-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.eco-icon {
+  font-size: 22px;
+  margin-bottom: 3px;
+}
+
+.eco-num {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--color-green);
+}
+
+.eco-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* 7. 批量快筛分选药丸 */
+.batch-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-pill {
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.filter-pill.active {
+  background: var(--color-brand);
+  color: #FFFFFF;
+  border-color: var(--color-brand);
+}
+
+/* 8. 报告纸张与防伪水印 */
+.report-paper {
+  background: #FFFFFF;
+  color: #0F172A;
+  border-radius: 8px;
+  padding: 36px 44px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+  font-family: "SimSun", "宋体", serif;
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+}
+
+.report-watermark {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 64px;
+  font-family: "SimHei", "黑体", sans-serif;
+  color: rgba(15, 23, 42, 0.04);
+  pointer-events: none;
+  white-space: nowrap;
+  font-weight: 900;
+}
+
+.report-paper h2 {
+  text-align: center;
+  font-size: 19px;
+  font-family: "SimHei", "黑体", sans-serif;
+  color: #0F172A;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #0F172A;
+  padding-bottom: 8px;
+}
+
+.report-meta-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.report-meta-table td {
+  border: 1px solid #CBD5E1;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #0F172A;
+}
+
+.report-meta-table td.label {
+  background: #F8FAFC;
+  font-weight: bold;
+  width: 25%;
+  font-family: "SimHei", "黑体", sans-serif;
+}
+
+.report-section-title {
+  font-size: 13.5px;
+  font-weight: bold;
+  font-family: "SimHei", "黑体", sans-serif;
+  color: #1E3A8A;
+  margin: 14px 0 6px 0;
+  border-left: 4px solid #1E3A8A;
+  padding-left: 8px;
+}
+
+.report-sign-block {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: 1px dashed #CBD5E1;
+  font-size: 11.5px;
+  color: #475569;
+}
+
+/* 点击跳转交互提示样式 */
+.clickable-card {
+  cursor: pointer !important;
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.clickable-card:hover {
+  border-color: var(--color-brand) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px var(--border-glow) !important;
+}
+
+.jump-hint {
+  font-size: 10.5px;
+  color: var(--color-brand);
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.clickable-card:hover .jump-hint {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* 选中电芯高亮效果 */
+.cell-chip.active-cell {
+  outline: 2px solid #FFFFFF !important;
+  box-shadow: 0 0 12px var(--color-brand) !important;
+  transform: scale(1.25);
+  z-index: 20;
+}

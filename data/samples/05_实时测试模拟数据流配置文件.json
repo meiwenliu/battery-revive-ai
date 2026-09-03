@@ -1,0 +1,169 @@
+{
+  "system_name": "焕芯·电愈智策多体系电池实时测试直连系统",
+  "version": "1.0.0",
+  "channels": [
+    {
+      "id": "CH01",
+      "battery_id": "LFP-35Ah-DEV-01",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "ONLINE",
+      "preset_soh": 91.8
+    },
+    {
+      "id": "CH02",
+      "battery_id": "LFP-35Ah-DEV-02",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "ONLINE",
+      "preset_soh": 88.6
+    },
+    {
+      "id": "CH03",
+      "battery_id": "LFP-35Ah-DEV-03",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "ONLINE",
+      "preset_soh": 85.4
+    },
+    {
+      "id": "CH04",
+      "battery_id": "LFP-35Ah-DEV-04",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "ONLINE",
+      "preset_soh": 82.2
+    },
+    {
+      "id": "CH05",
+      "battery_id": "LFP-35Ah-DEV-05",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "ONLINE",
+      "preset_soh": 79.0
+    },
+    {
+      "id": "CH06",
+      "battery_id": "LFP-35Ah-DEV-06",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "ONLINE",
+      "preset_soh": 75.8
+    },
+    {
+      "id": "CH07",
+      "battery_id": "LFP-35Ah-DEV-07",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "ONLINE",
+      "preset_soh": 72.6
+    },
+    {
+      "id": "CH08",
+      "battery_id": "LFP-35Ah-DEV-08",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "ONLINE",
+      "preset_soh": 69.4
+    },
+    {
+      "id": "CH09",
+      "battery_id": "LFP-35Ah-DEV-09",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "STANDBY",
+      "preset_soh": 66.2
+    },
+    {
+      "id": "CH10",
+      "battery_id": "LFP-35Ah-DEV-10",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "STANDBY",
+      "preset_soh": 63.0
+    },
+    {
+      "id": "CH11",
+      "battery_id": "LFP-35Ah-DEV-11",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "STANDBY",
+      "preset_soh": 59.8
+    },
+    {
+      "id": "CH12",
+      "battery_id": "LFP-35Ah-DEV-12",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "STANDBY",
+      "preset_soh": 56.6
+    },
+    {
+      "id": "CH13",
+      "battery_id": "LFP-35Ah-DEV-13",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "STANDBY",
+      "preset_soh": 53.4
+    },
+    {
+      "id": "CH14",
+      "battery_id": "LFP-35Ah-DEV-14",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "STANDBY",
+      "preset_soh": 50.2
+    },
+    {
+      "id": "CH15",
+      "battery_id": "LFP-35Ah-DEV-15",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "STANDBY",
+      "preset_soh": 47.0
+    },
+    {
+      "id": "CH16",
+      "battery_id": "LFP-35Ah-DEV-16",
+      "chemistry": "LFP",
+      "nominal_Ah": 35.0,
+      "status": "STANDBY",
+      "preset_soh": 43.8
+    }
+  ],
+  "protocols": [
+    {
+      "name": "SINGLE50 极速脉冲诊断协议",
+      "duration_s": 180,
+      "soc_point": 50,
+      "steps": [
+        "0-30s 零电流静置",
+        "30-90s 0.5C 充电脉冲",
+        "90-120s 1.0C 放电脉冲",
+        "120-150s 2.0C 放电脉冲",
+        "150-180s 撤载松弛弛豫"
+      ]
+    },
+    {
+      "name": "SPARSE3 稀疏三点脉冲协议",
+      "duration_s": 540,
+      "soc_points": [
+        20,
+        50,
+        80
+      ]
+    },
+    {
+      "name": "单次恒流放电特征提取协议",
+      "duration_s": 3600,
+      "current_rate": "0.5C"
+    }
+  ],
+  "sampling_rate_hz": 10,
+  "safety_limits": {
+    "max_voltage_v": 3.65,
+    "min_voltage_v": 2.0,
+    "max_temp_c": 55.0,
+    "max_current_a": 70.0
+  }
+}

@@ -1,0 +1,7 @@
+services:
+  # 方案 1：纯前端静态网站（极速、永不休眠、完全免费）
+  - type: static
+    name: battery-ai-system
+    rootDir: frontend
+    publishPath: .
+    plan: free
