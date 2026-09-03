@@ -280,15 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderBatchTable();
     updateBatchCounts();
 
-    // 真实性判断：若切换到无国家台架标定样本体系 (如硅碳 sic)，没有测量数据就诚实显示待测状态！
-    if (chemKey === 'sic') {
+    // 真实性原则：用户在下拉框切换任何材料体系时，仅更新该体系的标称物理规格，绝不擅自捏造预测或自动跑模型！
+    if (updateInputs) {
       isMeasurementDataLoaded = false;
-      renderUnmeasuredState('sic');
-    } else if (updateInputs) {
-      // 切换至有台架标定样本的体系时，自动关联真实标定电芯
-      if (chemKey === 'lfp') loadBenchmarkCell('retire_lfp');
-      else if (chemKey === 'ncm') loadBenchmarkCell('echelon_ncm');
-      else if (chemKey === 'naion') loadBenchmarkCell('naion_proto');
+      renderUnmeasuredState(chemKey);
     }
   }
 
@@ -410,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('valHealthGrade').textContent = '未定级 (等待实测数据驱动)';
       document.getElementById('valHealthGrade').style.color = 'var(--text-muted)';
     }
-    ChartManager.renderSohGauge('sohGaugeChart', 0);
+    ChartManager.renderEmptyState('sohGaugeChart', 'SOH 待测量', '未接入实测脉冲时序，能量表不激活');
 
     // 单电芯微观物理卡片
     renderCellPhysicsGrid(null, false);
