@@ -45,7 +45,7 @@ const CalculationEngine = {
       scale: 0.078
     },
     mean_baseline: {
-      name: "均值基线 (对照)",
+      name: "均值参考基准 (对照)",
       lobo_mae_pct: 4.52,
       r2: -0.0520,
       spearman: 0.0000,
@@ -89,7 +89,7 @@ const CalculationEngine = {
       coef: { intercept: 0.1615, Q_dis: 0.1220, CE: -0.0470, EE: 0.0330, V_mean_dis: -0.0510, V_hyst: 0.0670 }
     },
     mean_baseline: {
-      name: "历史均值基线 (对照)",
+      name: "历史均值参考基准 (对照)",
       loocv_mae_ah: 0.0573,
       r2: -0.0980,
       spearman: 0.0000,

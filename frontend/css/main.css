@@ -630,3 +630,291 @@ body {
 .custom-table tr:hover td {
   background: rgba(125, 125, 125, 0.08);
 }
+
+/* ==========================================================================
+   移动端与平板端多尺寸全响应式适配系统 (Mobile First / Responsive)
+   ========================================================================== */
+
+/* 1. 平板与中屏适配 (<= 1024px) */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 10px 20px;
+  }
+  .main-container {
+    padding: 14px 18px;
+  }
+  .pipeline-flow-bar, .nav-tabs, .sample-bar {
+    padding: 8px 18px;
+  }
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .grid-1-2, .grid-2-1 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* 2. 手机端深度适配 (<= 768px) */
+@media (max-width: 768px) {
+  /* 顶部全局导航栏紧凑化 */
+  .navbar {
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .brand-wrapper {
+    gap: 10px;
+  }
+
+  .brand-logo {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  .brand-text h1 {
+    font-size: 15px;
+    letter-spacing: 0.2px;
+  }
+
+  .brand-text p {
+    display: none; /* 移动端隐藏过长副标题，保持界面纯净整洁 */
+  }
+
+  .nav-status-group {
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .status-badge span:last-child {
+    display: none;
+  }
+
+  .status-badge::after {
+    content: "16通道";
+    font-size: 11px;
+  }
+
+  .btn-theme-pill {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .system-clock {
+    font-size: 11.5px;
+  }
+
+  /* 六阶流程脉冲流路条：支持丝滑横向滑动手势 */
+  .pipeline-flow-bar {
+    padding: 6px 10px;
+    gap: 6px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .pipeline-flow-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pipeline-step {
+    padding: 4px 8px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .pipeline-step-num {
+    width: 16px;
+    height: 16px;
+    font-size: 9.5px;
+  }
+
+  .pipeline-arrow {
+    flex-shrink: 0;
+    font-size: 10px;
+  }
+
+  /* 模块主导航标签：横向滑动且不换行 */
+  .nav-tabs {
+    padding: 6px 10px;
+    gap: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tab-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  /* 示例快捷栏：垂直排布，按钮横向平铺滑动 */
+  .sample-bar {
+    padding: 8px 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .sample-bar > div:last-child {
+    display: none; /* 移动端隐藏过长的全体系说明文字，避免乱折行 */
+  }
+
+  .sample-actions {
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100%;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+  }
+
+  .sample-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .btn-sample {
+    flex-shrink: 0;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* 主容器与边距紧凑化 */
+  .main-container {
+    padding: 10px 8px;
+  }
+
+  /* 网格系统在移动端自动单列/双列重排 */
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .grid-2, .grid-1-2, .grid-2-1 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* 4 大核心 KPI 极简卡片 */
+  .kpi-card {
+    padding: 8px 10px;
+  }
+
+  .kpi-label {
+    font-size: 10.5px;
+    margin-bottom: 2px;
+  }
+
+  .kpi-value {
+    font-size: 16px;
+    letter-spacing: 0;
+  }
+
+  .kpi-unit {
+    font-size: 9.5px;
+  }
+
+  .kpi-badge {
+    font-size: 9.5px;
+    padding: 1px 5px;
+    margin-top: 4px;
+  }
+
+  /* 通用卡片内边距 */
+  .card {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .card-header {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  /* 图表高度移动端黄金比例 */
+  .chart-container {
+    height: 220px;
+  }
+
+  .chart-container.tall {
+    height: 250px;
+  }
+
+  .chart-container.short {
+    height: 160px;
+  }
+
+  /* 表单与输入框优化：16px 防 iOS 聚焦自动放大，手感更佳 */
+  .form-input, .form-select {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  .form-label {
+    font-size: 11px;
+    margin-bottom: 3px;
+  }
+
+  /* 所有数据表格水平滑动防溢出 */
+  .custom-table {
+    min-width: 440px;
+    font-size: 11.5px;
+  }
+
+  .custom-table th, .custom-table td {
+    padding: 6px 8px;
+  }
+}
+
+/* 3. 小屏手机极窄场景 (< 400px) */
+@media (max-width: 400px) {
+  .navbar {
+    padding: 6px 8px;
+  }
+
+  .brand-text h1 {
+    font-size: 13.5px;
+  }
+
+  .theme-switch-group {
+    display: none; /* 超窄屏隐藏主题组，只保留时钟和状态 */
+  }
+
+  .grid-4 {
+    gap: 6px;
+  }
+
+  .kpi-value {
+    font-size: 14.5px;
+  }
+
+  .kpi-card {
+    padding: 6px 8px;
+  }
+}
+

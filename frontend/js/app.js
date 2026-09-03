@@ -497,4 +497,13 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPackMatrix();
   renderBatchTable();
   runFullEvaluation();
+
+  // 13. 移动端屏幕旋转与窗口缩放自适应监听
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      ChartManager.resizeAll();
+    }, 150);
+  });
 });

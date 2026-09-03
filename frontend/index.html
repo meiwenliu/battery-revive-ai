@@ -183,7 +183,7 @@
               <option value="ridge">岭回归 (Ridge Regression)</option>
               <option value="pls">偏最小二乘 (PLS)</option>
               <option value="svr">支持向量机 (SVR)</option>
-              <option value="mean_baseline">均值基线 (对照)</option>
+              <option value="mean_baseline">均值参考基准 (对照)</option>
             </select>
           </div>
 
@@ -194,7 +194,7 @@
               <option value="linear">多元线性回归 (Linear)</option>
               <option value="lasso">套索回归 (Lasso)</option>
               <option value="gpr">高斯过程回归 (GPR)</option>
-              <option value="mean_baseline">历史均值基线 (对照)</option>
+              <option value="mean_baseline">历史均值参考基准 (对照)</option>
             </select>
           </div>
 
@@ -525,17 +525,19 @@
         <div class="card-header">
           <div class="card-title"><span>📑</span> 多模型横向预测对照矩阵</div>
         </div>
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>算法模型</th>
-              <th>预测 SOH</th>
-              <th>健康等级</th>
-              <th>LOBO 误差</th>
-            </tr>
-          </thead>
-          <tbody id="multiModelCompareBody"></tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>算法模型</th>
+                <th>预测 SOH</th>
+                <th>健康等级</th>
+                <th>LOBO 误差</th>
+              </tr>
+            </thead>
+            <tbody id="multiModelCompareBody"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -566,7 +568,7 @@
             </div>
           </div>
 
-          <div style="max-height:280px; overflow-y:auto;">
+          <div style="max-height:280px; overflow:auto; -webkit-overflow-scrolling:touch;">
             <table class="custom-table">
               <thead>
                 <tr>
@@ -600,37 +602,39 @@
           <div class="card-header">
             <div class="card-title"><span>🌱</span> 制造端碳减排链路明细</div>
           </div>
-          <table class="custom-table">
-            <thead>
-              <tr>
-                <th>核算环节</th>
-                <th>数值</th>
-                <th>排放贡献</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>恢复电量</td>
-                <td>6.568 kWh</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td>制造端规避量</td>
-                <td>105 kgCO₂e/kWh</td>
-                <td><strong style="color:var(--color-green);">+420.36 kg</strong></td>
-              </tr>
-              <tr>
-                <td>调理电网电耗</td>
-                <td>8.50 kWh</td>
-                <td><strong style="color:var(--color-rose);">-4.94 kg</strong></td>
-              </tr>
-              <tr style="background:rgba(16,185,129,0.12);">
-                <td><strong>净碳减排量</strong></td>
-                <td><strong>6.568 kWh 洁净电量</strong></td>
-                <td><strong style="color:var(--color-brand); font-size:15px;">415.42 kgCO₂e</strong></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>核算环节</th>
+                  <th>数值</th>
+                  <th>排放贡献</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>恢复电量</td>
+                  <td>6.568 kWh</td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>制造端规避量</td>
+                  <td>105 kgCO₂e/kWh</td>
+                  <td><strong style="color:var(--color-green);">+420.36 kg</strong></td>
+                </tr>
+                <tr>
+                  <td>调理电网电耗</td>
+                  <td>8.50 kWh</td>
+                  <td><strong style="color:var(--color-rose);">-4.94 kg</strong></td>
+                </tr>
+                <tr style="background:rgba(16,185,129,0.12);">
+                  <td><strong>净碳减排量</strong></td>
+                  <td><strong>6.568 kWh 洁净电量</strong></td>
+                  <td><strong style="color:var(--color-brand); font-size:15px;">415.42 kgCO₂e</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="card">

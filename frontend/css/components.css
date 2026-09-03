@@ -452,3 +452,166 @@
   transform: scale(1.25);
   z-index: 20;
 }
+
+/* ==========================================================================
+   组件级移动端与触控设备深度适配 (Component Responsive Overrides)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* 1. 100 只电芯矩阵：由 20 列智能重构为 10 列 (10x10 正方形矩阵)，大幅提升手机端触控易用度 */
+  .pack-cells-grid {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 3px;
+    padding: 4px;
+  }
+
+  .cell-chip {
+    font-size: 9px;
+    aspect-ratio: 1;
+    border-radius: 4px;
+  }
+
+  .pack-matrix-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pack-legend {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* 2. 四级分选决策大卡片 */
+  .tier-decision-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .tier-info h3 {
+    font-size: 14.5px;
+    line-height: 1.3;
+  }
+
+  .tier-info p {
+    font-size: 11px;
+  }
+
+  .tier-badge-large {
+    font-size: 14px;
+    padding: 4px 10px;
+    align-self: flex-start;
+  }
+
+  /* 3. 16 通道选择器重排为 4 列 */
+  .channel-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+  }
+
+  .channel-btn {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+
+  /* 4. 实时示波器高度与 HUD 适配 */
+  .oscilloscope-box {
+    height: 190px;
+  }
+
+  .oscilloscope-hud {
+    font-size: 9.5px;
+    gap: 6px;
+    padding: 2px 6px;
+  }
+
+  .pulse-injection-bar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .btn-pulse {
+    padding: 7px 6px;
+    font-size: 11px;
+  }
+
+  /* 5. 碳排生态等效四宫格转换为 2x2 宫格 */
+  .eco-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .eco-item {
+    padding: 8px 10px;
+  }
+
+  .eco-icon {
+    font-size: 18px;
+  }
+
+  .eco-num {
+    font-size: 16px;
+  }
+
+  .eco-desc {
+    font-size: 10.5px;
+  }
+
+  /* 6. 批量快筛药丸栏 */
+  .batch-filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .filter-pills {
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .filter-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-pill {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  /* 7. 决策评估报告纸张缩微边距 */
+  .report-paper {
+    padding: 18px 14px;
+  }
+
+  .report-paper h2 {
+    font-size: 16px;
+  }
+
+  .report-watermark {
+    font-size: 32px;
+  }
+
+  .report-meta-table td {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+
+  .report-meta-table td.label {
+    width: 32%;
+  }
+
+  .report-sign-block {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 18px;
+  }
+}
+
