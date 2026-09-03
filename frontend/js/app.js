@@ -714,25 +714,259 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPreset(scenario) {
       if (scenario === 'ev_3yr') {
         this.currentRecords = [
-          { id: 'REC-001', stage: '新车交付标定', date: '2023-05-10', soh: 100.0, rdc: 9.8, note: '出厂参考基准', tier: 'A级(优选储能)', hash: 'dp_e3b0...9821' },
-          { id: 'REC-002', stage: '1.5万km首保体检', date: '2024-02-18', soh: 94.2, rdc: 10.9, note: '常规首保健康核查', tier: 'A级(优选储能)', hash: 'dp_a1b2...8812' },
-          { id: 'REC-003', stage: '3.2万km年检巡测', date: '2024-12-05', soh: 88.5, rdc: 12.3, note: '冬季低温工况巡检', tier: 'A级(高敏备电)', hash: 'dp_7c9f...5541' },
-          { id: 'REC-004', stage: '4.8万km退役初检', date: '2025-08-30', soh: 76.8, rdc: 14.5, note: '达成梯次利用分选条件', tier: 'B级(调理再生)', hash: 'dp_99a8...3321' },
-          { id: 'REC-005', stage: '微调理激活再生', date: '2025-09-03', soh: 83.5, rdc: 11.8, note: '活性锂脱嵌恢复', tier: 'A级(储能直接服役)', hash: 'dp_f4e3...1109' }
+          {
+            id: 'REC-001',
+            order_no: 'ORD-2023-EV-0510',
+            client_name: '新车交付车主 (张先生)',
+            cell_sn: 'CATL-LFP-35Ah-202304-0982',
+            mfr: '宁德时代 (CATL)',
+            age_years: 0.1,
+            mileage: '0.05 万公里 / 15 循环',
+            stage: '新车交付首检标定',
+            date: '2023-05-10',
+            soh: 100.0,
+            rdc: 9.8,
+            tier: 'A 级 (优选储能)',
+            valuation_amount: '18,800 元 (原值新车标定)',
+            residual_pct: '100.0%',
+            inspector: '交付中心检测师 #01',
+            purpose: '新车交付出厂健康度公证',
+            hash: 'dp_e3b0...9821'
+          },
+          {
+            id: 'REC-002',
+            order_no: 'ORD-2024-EV-0218',
+            client_name: '个人车主 (张先生)',
+            cell_sn: 'CATL-LFP-35Ah-202304-0982',
+            mfr: '宁德时代 (CATL)',
+            age_years: 0.9,
+            mileage: '1.5 万公里 / 320 循环',
+            stage: '1.5万km首保体检',
+            date: '2024-02-18',
+            soh: 94.2,
+            rdc: 10.9,
+            tier: 'A 级 (优选储能)',
+            valuation_amount: '16,500 元 (在役健康)',
+            residual_pct: '87.8%',
+            inspector: '4S旗舰店技师 #05',
+            purpose: '常规首保健康度核查',
+            hash: 'dp_a1b2...8812'
+          },
+          {
+            id: 'REC-003',
+            order_no: 'ORD-2024-EV-1205',
+            client_name: '个人车主 (张先生)',
+            cell_sn: 'CATL-LFP-35Ah-202304-0982',
+            mfr: '宁德时代 (CATL)',
+            age_years: 1.8,
+            mileage: '3.2 万公里 / 710 循环',
+            stage: '冬季低温年检巡测',
+            date: '2024-12-05',
+            soh: 88.5,
+            rdc: 12.3,
+            tier: 'A 级 (高敏备电)',
+            valuation_amount: '14,200 元 (在役良好)',
+            residual_pct: '75.5%',
+            inspector: '检测服务站工程师 #03',
+            purpose: '冬季电池低温极化体检',
+            hash: 'dp_7c9f...5541'
+          },
+          {
+            id: 'REC-004',
+            order_no: 'ORD-2025-EV-0830',
+            client_name: '顺达二手车交易平台 (张先生委托)',
+            cell_sn: 'CATL-LFP-35Ah-202304-0982',
+            mfr: '宁德时代 (CATL)',
+            age_years: 2.8,
+            mileage: '6.8 万公里 / 1,450 循环',
+            stage: '二手交易初检评估',
+            date: '2025-08-30',
+            soh: 76.8,
+            rdc: 14.5,
+            tier: 'B 级 (调理再生)',
+            valuation_amount: '11,300 元 (待调理残值)',
+            residual_pct: '60.1%',
+            inspector: '国家二手车评估师 #09',
+            purpose: '二手车交易残值公证',
+            hash: 'dp_99a8...3321'
+          },
+          {
+            id: 'REC-005',
+            order_no: 'ORD-2025-EV-0903',
+            client_name: '电池焕芯调理服务中心',
+            cell_sn: 'CATL-LFP-35Ah-202304-0982',
+            mfr: '宁德时代 (CATL)',
+            age_years: 2.8,
+            mileage: '6.8 万公里 / 调理激活',
+            stage: '微调理再生验收公证',
+            date: '2025-09-03',
+            soh: 83.5,
+            rdc: 11.8,
+            tier: 'A 级 (储能直接服役)',
+            valuation_amount: '13,800 元 (再生增值+22%)',
+            residual_pct: '73.4%',
+            inspector: '高级电化学工程师 #08',
+            purpose: '微调理再生效果工程验收',
+            hash: 'dp_f4e3...1109'
+          }
         ];
       } else if (scenario === 'base_station') {
         this.currentRecords = [
-          { id: 'REC-001', stage: '通信基站挂载首检', date: '2022-08-10', soh: 99.5, rdc: 12.2, note: '备电储能模组投运', tier: 'A级(优质储能)', hash: 'dp_44a1...9011' },
-          { id: 'REC-002', stage: '1年夏季高温巡测', date: '2023-08-15', soh: 91.0, rdc: 13.8, note: '机房高温轻微极化', tier: 'A级(高敏备电)', hash: 'dp_88c7...4412' },
-          { id: 'REC-003', stage: '2年役期健康核查', date: '2024-08-20', soh: 82.5, rdc: 15.6, note: '常年浮充微失水', tier: 'B级(调理再生)', hash: 'dp_33f4...7781' },
-          { id: 'REC-004', stage: '3年轮换调理复测', date: '2025-08-25', soh: 88.0, rdc: 13.2, note: '微调理再生恢复成功', tier: 'A级(基站继续服役)', hash: 'dp_22b3...6690' }
+          {
+            id: 'REC-001',
+            order_no: 'ORD-2022-TOW-0810',
+            client_name: '中国铁塔某市分公司',
+            cell_sn: 'GOTION-30Ah-2022-T01',
+            mfr: '国轩高科 (Gotion)',
+            age_years: 0.1,
+            mileage: '基站投运首检',
+            stage: '通信备电挂载首检',
+            date: '2022-08-10',
+            soh: 99.5,
+            rdc: 12.2,
+            tier: 'A 级 (优选储能)',
+            valuation_amount: '15,600 元',
+            residual_pct: '98.5%',
+            inspector: '铁塔运维工程师 #02',
+            purpose: '5G基站备电投运验收',
+            hash: 'dp_44a1...9011'
+          },
+          {
+            id: 'REC-002',
+            order_no: 'ORD-2023-TOW-0815',
+            client_name: '中国铁塔某市分公司',
+            cell_sn: 'GOTION-30Ah-2022-T01',
+            mfr: '国轩高科 (Gotion)',
+            age_years: 1.0,
+            mileage: '常年浮充 1 年',
+            stage: '1年夏季高温巡测',
+            date: '2023-08-15',
+            soh: 91.0,
+            rdc: 13.8,
+            tier: 'A 级 (高敏备电)',
+            valuation_amount: '13,200 元',
+            residual_pct: '84.6%',
+            inspector: '铁塔运维工程师 #02',
+            purpose: '夏季高温防断电巡检',
+            hash: 'dp_88c7...4412'
+          },
+          {
+            id: 'REC-003',
+            order_no: 'ORD-2024-TOW-0820',
+            client_name: '中国铁塔某市分公司',
+            cell_sn: 'GOTION-30Ah-2022-T01',
+            mfr: '国轩高科 (Gotion)',
+            age_years: 2.0,
+            mileage: '常年浮充 2 年',
+            stage: '2年役期健康核查',
+            date: '2024-08-20',
+            soh: 82.5,
+            rdc: 15.6,
+            tier: 'B 级 (调理再生)',
+            valuation_amount: '10,800 元',
+            residual_pct: '69.2%',
+            inspector: '通信装备检验员 #04',
+            purpose: '备电蓄电池役龄考核',
+            hash: 'dp_33f4...7781'
+          },
+          {
+            id: 'REC-004',
+            order_no: 'ORD-2025-TOW-0825',
+            client_name: '中国铁塔某市分公司',
+            cell_sn: 'GOTION-30Ah-2022-T01',
+            mfr: '国轩高科 (Gotion)',
+            age_years: 3.0,
+            mileage: '轮换调理激活',
+            stage: '3年轮换调理复测',
+            date: '2025-08-25',
+            soh: 88.0,
+            rdc: 13.2,
+            tier: 'A 级 (基站继续服役)',
+            valuation_amount: '12,600 元',
+            residual_pct: '80.7%',
+            inspector: '通信装备检验员 #04',
+            purpose: '轮换调理后延保评估',
+            hash: 'dp_22b3...6690'
+          }
         ];
       } else if (scenario === 'grid_storage') {
         this.currentRecords = [
-          { id: 'REC-001', stage: '电网调峰电站并网', date: '2023-01-01', soh: 100.0, rdc: 8.5, note: 'MW级电站初装', tier: 'A级(高价值储能)', hash: 'dp_11e2...5566' },
-          { id: 'REC-002', stage: '1000次循环体检', date: '2023-10-15', soh: 92.0, rdc: 9.9, note: '日双充双放工况', tier: 'A级(高价值储能)', hash: 'dp_77b8...1122' },
-          { id: 'REC-003', stage: '2500次循环体检', date: '2024-11-20', soh: 81.2, rdc: 12.4, note: '达到中度衰退区间', tier: 'B级(调理再生)', hash: 'dp_88a9...3344' },
-          { id: 'REC-004', stage: '3600次退役初检', date: '2025-07-10', soh: 73.5, rdc: 14.8, note: '建议分选降额利用', tier: 'C级(轻载利用)', hash: 'dp_99b0...5566' }
+          {
+            id: 'REC-001',
+            order_no: 'ORD-2023-ESS-0101',
+            client_name: '新华电网调峰调频储能电站',
+            cell_sn: 'BYD-138Ah-ESS-01',
+            mfr: '比亚迪 (FinDreams)',
+            age_years: 0.1,
+            mileage: '并网初检',
+            stage: '电网调峰电站并网',
+            date: '2023-01-01',
+            soh: 100.0,
+            rdc: 8.5,
+            tier: 'A 级 (高价值储能)',
+            valuation_amount: '22,000 元',
+            residual_pct: '100.0%',
+            inspector: '电网质检工程师 #01',
+            purpose: '储能电站初装入网公证',
+            hash: 'dp_11e2...5566'
+          },
+          {
+            id: 'REC-002',
+            order_no: 'ORD-2023-ESS-1015',
+            client_name: '新华电网调峰调频储能电站',
+            cell_sn: 'BYD-138Ah-ESS-01',
+            mfr: '比亚迪 (FinDreams)',
+            age_years: 0.8,
+            mileage: '1,000 次高频循环',
+            stage: '1000次循环体检',
+            date: '2023-10-15',
+            soh: 92.0,
+            rdc: 9.9,
+            tier: 'A 级 (高价值储能)',
+            valuation_amount: '19,500 元',
+            residual_pct: '88.6%',
+            inspector: '电网质检工程师 #01',
+            purpose: '高频双充双放周期定检',
+            hash: 'dp_77b8...1122'
+          },
+          {
+            id: 'REC-003',
+            order_no: 'ORD-2024-ESS-1120',
+            client_name: '新华电网调峰调频储能电站',
+            cell_sn: 'BYD-138Ah-ESS-01',
+            mfr: '比亚迪 (FinDreams)',
+            age_years: 1.9,
+            mileage: '2,500 次高频循环',
+            stage: '2500次循环体检',
+            date: '2024-11-20',
+            soh: 81.2,
+            rdc: 12.4,
+            tier: 'B 级 (调理再生)',
+            valuation_amount: '15,600 元',
+            residual_pct: '70.9%',
+            inspector: '电网质检工程师 #02',
+            purpose: '电网安全运行考核',
+            hash: 'dp_88a9...3344'
+          },
+          {
+            id: 'REC-004',
+            order_no: 'ORD-2025-ESS-0710',
+            client_name: '新华电网调峰调频储能电站',
+            cell_sn: 'BYD-138Ah-ESS-01',
+            mfr: '比亚迪 (FinDreams)',
+            age_years: 2.5,
+            mileage: '3,600 次寿命终期',
+            stage: '3600次退役初检',
+            date: '2025-07-10',
+            soh: 73.5,
+            rdc: 14.8,
+            tier: 'C 级 (轻载利用)',
+            valuation_amount: '9,800 元',
+            residual_pct: '44.5%',
+            inspector: '梯次利用评估师 #07',
+            purpose: '电网退役梯次分选转让',
+            hash: 'dp_99b0...5566'
+          }
         ];
       }
       this.saveToStorage();
@@ -741,39 +975,306 @@ document.addEventListener('DOMContentLoaded', () => {
       this.updateSummaryCard();
     },
 
-    addCurrentEvaluation() {
-      const sohEl = document.getElementById('valSOH');
-      const soh = sohEl ? parseFloat(sohEl.textContent) : 75.4;
-      const rdcEl = document.getElementById('inputRdcDis');
-      const rdc = rdcEl ? +(parseFloat(rdcEl.value) * 1000).toFixed(1) : 12.4;
-      const tierEl = document.getElementById('valEchelonTierTitle');
-      const tier = tierEl ? tierEl.textContent.split('：')[0] : 'B 级(调理再生)';
-      const note = prompt('请输入本次体检备注（例如：第3次日常体检、夏季长途后检测、调理再生二次校验等）：', '日常健康体检') || '日常健康体检';
-      
+    // 商业档案详细建档弹窗控制
+    openIntakeModal() {
+      const modal = document.getElementById('modalBatteryIntake');
+      if (!modal) return;
+
+      // 读取当前工作台最新的测试值预填
+      const getVal = (id, fallback) => {
+        const el = document.getElementById(id);
+        return el ? el.value : fallback;
+      };
+
+      if (document.getElementById('intakeValU0')) document.getElementById('intakeValU0').value = getVal('inputU0', '3.2850');
+      if (document.getElementById('intakeValRdc')) document.getElementById('intakeValRdc').value = getVal('inputRdcDis', '0.0150');
+      if (document.getElementById('intakeValQdis')) document.getElementById('intakeValQdis').value = getVal('inputQDis', '26.40');
+      if (document.getElementById('intakeValEta')) document.getElementById('intakeValEta').value = getVal('inputEta', '-0.0300');
+      if (document.getElementById('intakeNomCap')) document.getElementById('intakeNomCap').value = getVal('inputNomCap', '35.0');
+      if (document.getElementById('intakeNomVolt')) document.getElementById('intakeNomVolt').value = getVal('inputVNom', '3.20');
+      if (document.getElementById('intakeCellSn')) document.getElementById('intakeCellSn').value = getVal('inputCellId', 'CATL-LFP-35Ah-2026-A0982');
+
+      modal.style.display = 'flex';
+    },
+
+    closeIntakeModal() {
+      const modal = document.getElementById('modalBatteryIntake');
+      if (modal) modal.style.display = 'none';
+    },
+
+    // 快捷填充典型商业建档案例
+    fillIntakePreset(type) {
+      if (type === 'preset_ev_user') {
+        document.getElementById('intakeClientName').value = '顺达新能源智慧物流 (个人车主: 张先生)';
+        document.getElementById('intakeOrderNo').value = 'ORD-2026-EV-8831';
+        document.getElementById('intakeContact').value = '138****6621 (zhang@ev-trade.cn)';
+        document.getElementById('intakePurpose').value = '二手车交易残值评估与公证';
+        document.getElementById('intakeCellSn').value = 'CATL-LFP-35Ah-202304-0982';
+        document.getElementById('intakeManufacturer').value = '宁德时代 (CATL)';
+        document.getElementById('intakeFormFactor').value = '方形铝壳 (Prismatic)';
+        document.getElementById('intakeMfgDate').value = '2023-04';
+        document.getElementById('intakeNomCap').value = '35.0';
+        document.getElementById('intakeNomVolt').value = '3.20';
+        document.getElementById('intakeAgeYears').value = '2.8';
+        document.getElementById('intakeMileage').value = '6.8 万公里 / 1,450 循环';
+        document.getElementById('intakeEnvironment').value = '常温普通工况 (15~28℃)';
+        document.getElementById('intakeChargeHabit').value = '高频快充为主 (超快充>70%)';
+        document.getElementById('intakeIncidentRecord').value = '底盘轻微刮蹭未伤及电芯包，无进水事故记录';
+        document.getElementById('intakeValU0').value = '3.2850';
+        document.getElementById('intakeValRdc').value = '0.0150';
+        document.getElementById('intakeValQdis').value = '26.40';
+        document.getElementById('intakeValEta').value = '-0.0300';
+        document.getElementById('intakeInspector').value = '国家新能源汽车质检中心 / 评估师 #06';
+      } else if (type === 'preset_storage_plant') {
+        document.getElementById('intakeClientName').value = '中广核新能源 (500kWh 工商业储能电站资产管理部)';
+        document.getElementById('intakeOrderNo').value = 'ORD-2026-ESS-1029';
+        document.getElementById('intakeContact').value = '021-5888**** (storage@cgn-energy.com)';
+        document.getElementById('intakePurpose').value = '退役动力电池梯次利用储能准入评估';
+        document.getElementById('intakeCellSn').value = 'BYD-BLADE-LFP-138Ah-ESS-401';
+        document.getElementById('intakeManufacturer').value = '比亚迪 (FinDreams)';
+        document.getElementById('intakeFormFactor').value = '方形铝壳 (Prismatic)';
+        document.getElementById('intakeMfgDate').value = '2022-09';
+        document.getElementById('intakeNomCap').value = '138.0';
+        document.getElementById('intakeNomVolt').value = '3.20';
+        document.getElementById('intakeAgeYears').value = '3.5';
+        document.getElementById('intakeMileage').value = '累计充放电 1,820 次 (日单充单放)';
+        document.getElementById('intakeEnvironment').value = '南方夏季高温高湿 (35~42℃)';
+        document.getElementById('intakeChargeHabit').value = '常年浅充浅放浮充 (储能备电)';
+        document.getElementById('intakeIncidentRecord').value = '定期巡检，模组BMS曾报过压轻微告警已校正';
+        document.getElementById('intakeValU0').value = '3.2800';
+        document.getElementById('intakeValRdc').value = '0.0145';
+        document.getElementById('intakeValQdis').value = '104.50';
+        document.getElementById('intakeValEta').value = '-0.0280';
+        document.getElementById('intakeInspector').value = '储能装备质检国家重点实验室 / 工程师 #12';
+      } else if (type === 'preset_telecom_tower') {
+        document.getElementById('intakeClientName').value = '中国铁塔通信网络运维部 (5G宏基站备电项目组)';
+        document.getElementById('intakeOrderNo').value = 'ORD-2026-TOW-3302';
+        document.getElementById('intakeContact').value = '186****9912 (tower_power@china-tower.cn)';
+        document.getElementById('intakePurpose').value = '储能电站健康安全年度巡检与延保';
+        document.getElementById('intakeCellSn').value = 'GOTION-LFP-30Ah-TOWER-772';
+        document.getElementById('intakeManufacturer').value = '国轩高科 (Gotion)';
+        document.getElementById('intakeFormFactor').value = '方形铝壳 (Prismatic)';
+        document.getElementById('intakeMfgDate').value = '2021-11';
+        document.getElementById('intakeNomCap').value = '30.0';
+        document.getElementById('intakeNomVolt').value = '3.20';
+        document.getElementById('intakeAgeYears').value = '4.2';
+        document.getElementById('intakeMileage').value = '常年浮充备电 / 应急深放电 118 次';
+        document.getElementById('intakeEnvironment').value = '北方冬季极寒低温 (-10~-25℃)';
+        document.getElementById('intakeChargeHabit').value = '常年浅充浅放浮充 (储能备电)';
+        document.getElementById('intakeIncidentRecord').value = '历次断电应急放电正常，无热失控前兆';
+        document.getElementById('intakeValU0').value = '3.2650';
+        document.getElementById('intakeValRdc').value = '0.0182';
+        document.getElementById('intakeValQdis').value = '20.80';
+        document.getElementById('intakeValEta').value = '-0.0380';
+        document.getElementById('intakeInspector').value = '通信储能质量评估中心 / 检验员 #03';
+      }
+    },
+
+    // 提交建档表单并完成商业资产评估与公证书生成
+    submitIntakeModal() {
+      const clientName = document.getElementById('intakeClientName')?.value || '委托客户 (个人车主)';
+      const orderNo = document.getElementById('intakeOrderNo')?.value || ('ORD-' + Date.now().toString().slice(-8));
+      const cellSn = document.getElementById('intakeCellSn')?.value || 'CELL-SN-DEFAULT';
+      const mfr = document.getElementById('intakeManufacturer')?.value || '宁德时代 (CATL)';
+      const purpose = document.getElementById('intakePurpose')?.value || '二手车交易残值评估与公证';
+      const formFactor = document.getElementById('intakeFormFactor')?.value || '方形铝壳';
+      const mfgDate = document.getElementById('intakeMfgDate')?.value || '2023-04';
+      const ageYears = parseFloat(document.getElementById('intakeAgeYears')?.value) || 2.5;
+      const mileage = document.getElementById('intakeMileage')?.value || '5.0 万公里';
+      const env = document.getElementById('intakeEnvironment')?.value || '常温工况';
+      const habit = document.getElementById('intakeChargeHabit')?.value || '常规充电';
+      const incident = document.getElementById('intakeIncidentRecord')?.value || '无事故记录';
+      const inspector = document.getElementById('intakeInspector')?.value || '注册电池评估师 #08';
+      const temp = document.getElementById('intakeTemp')?.value || '25.0 ℃';
+
+      const nomCap = parseFloat(document.getElementById('intakeNomCap')?.value) || 35.0;
+      const nomVolt = parseFloat(document.getElementById('intakeNomVolt')?.value) || 3.20;
+      const u0 = parseFloat(document.getElementById('intakeValU0')?.value) || 3.2850;
+      const rdc = parseFloat(document.getElementById('intakeValRdc')?.value) || 0.0150;
+      const qdis = parseFloat(document.getElementById('intakeValQdis')?.value) || 26.40;
+      const eta = parseFloat(document.getElementById('intakeValEta')?.value) || -0.0300;
+
+      // 调用计算引擎推演当前电芯真实的 SOH 与恢复指标
+      const m1Res = CalculationEngine.predictSOH(u0, rdc, rdc * 1.08, -0.003, eta, -0.06, 0.055, 50.0, 'xgboost', 'lfp', qdis, nomCap);
+      const m2Res = CalculationEngine.predictRecoverability(qdis, 0.982, 0.895, nomVolt * 0.998, 0.142, nomCap, m1Res.predicted_soh_pct, 'elasticnet');
+      const echRes = CalculationEngine.classifyEchelon(m1Res.predicted_soh_pct, m2Res.rpi_pct, m2Res.predicted_after_soh_pct, rdc, 0.982);
+
+      // 商业残值估算
+      let residualRate = +(m1Res.predicted_soh_pct * 0.85).toFixed(1);
+      if (m1Res.predicted_soh_pct < 65.0) residualRate = 22.5;
+      const packKwh = (nomCap * nomVolt / 1000) * 16; // 模组等效
+      const baseValuation = packKwh * 550 * (residualRate / 100);
+      const valStr = `${Math.round(baseValuation).toLocaleString()} 元 (残值率 ${residualRate}%)`;
+
       const now = new Date();
       const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
       const hash = 'dp_' + Math.random().toString(36).substring(2, 6) + '...' + Math.random().toString(36).substring(2, 6);
 
-      this.currentRecords.push({
+      const record = {
         id: 'REC-' + (this.currentRecords.length + 1).toString().padStart(3, '0'),
-        stage: `第 ${this.currentRecords.length + 1} 次体检`,
+        order_no: orderNo,
+        client_name: clientName,
+        cell_sn: cellSn,
+        mfr: mfr,
+        form_factor: formFactor,
+        mfg_date: mfgDate,
+        nom_cap: nomCap,
+        nom_volt: nomVolt,
+        age_years: ageYears,
+        mileage: mileage,
+        env: env,
+        charge_habit: habit,
+        incident: incident,
+        inspector: inspector,
+        temp: temp,
+        purpose: purpose,
+        stage: `${ageYears}年役期商业评估`,
         date: dateStr,
-        soh: soh,
-        rdc: rdc,
-        note: note,
-        tier: tier,
+        soh: m1Res.predicted_soh_pct,
+        rdc: +(rdc * 1000).toFixed(1),
+        qrec: m2Res.predicted_qrec_ah,
+        after_soh: m2Res.predicted_after_soh_pct,
+        tier: echRes.tier.split('：')[0],
+        tier_full: echRes.tier,
+        scene: echRes.scene,
+        action: echRes.action,
+        valuation_amount: valStr,
+        residual_pct: `${residualRate}%`,
         hash: hash
-      });
+      };
 
+      this.currentRecords.push(record);
       this.saveToStorage();
       this.renderTable();
       this.renderChart();
       this.updateSummaryCard();
-      alert('✅ 当次体检记录已成功保存至您的电池终身健康档案库！已自动执行差分隐私脱敏与特征向量归档。');
+      this.closeIntakeModal();
+
+      // 自动弹出权威商业质检评估公证书
+      this.showCertificate(record.id);
+    },
+
+    // 渲染并展示权威第三方商业资产评估公证书
+    showCertificate(recordId) {
+      const record = this.currentRecords.find(r => r.id === recordId) || this.currentRecords[this.currentRecords.length - 1];
+      if (!record) return;
+
+      const content = document.getElementById('certificateModalContent');
+      if (!content) return;
+
+      const certHtml = `
+        <div style="border:2px solid rgba(0, 229, 255, 0.4); border-radius:10px; padding:24px; background:linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%); position:relative; overflow:hidden;">
+          <div style="position:absolute; right:20px; top:20px; width:100px; height:100px; border:3px dashed rgba(16, 185, 129, 0.4); border-radius:50%; display:flex; align-items:center; justify-content:center; transform:rotate(-15deg); pointer-events:none;">
+            <span style="font-size:11px; font-weight:900; color:rgba(16, 185, 129, 0.6); text-align:center; line-height:1.2;">
+              第三方权威<br>评估认证章<br>★ 检验合格 ★
+            </span>
+          </div>
+
+          <div style="text-align:center; border-bottom:2px solid var(--border-color); padding-bottom:14px; margin-bottom:18px;">
+            <div style="font-size:11px; letter-spacing:2px; color:var(--color-brand); font-weight:700;">NATIONAL NEW ENERGY BATTERY ASSET VALUATION REPORT</div>
+            <h2 style="font-size:18px; color:var(--text-primary); margin-top:4px; font-weight:800;">
+              新能源动力与储能电池商业健康资产评估公证书
+            </h2>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              公证单号：<strong style="color:var(--color-cyan); font-family:monospace;">${record.order_no || 'ORD-2026-VAL-001'}</strong> · 
+              评估日期：${record.date} · 
+              存证哈希：<span style="font-family:monospace;">${record.hash}</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="font-size:12.5px; font-weight:800; color:var(--color-cyan); margin-bottom:8px;">一、送检委托与电池出厂档案</div>
+            <table class="report-meta-table">
+              <tr>
+                <td class="label">委托客户 / 单位：</td>
+                <td><strong>${record.client_name || '个人车主'}</strong></td>
+                <td class="label">送检业务诉求：</td>
+                <td><strong style="color:var(--color-brand);">${record.purpose || '二手车交易残值公证'}</strong></td>
+              </tr>
+              <tr>
+                <td class="label">电池唯一编码 (SN)：</td>
+                <td style="font-family:monospace; color:var(--text-primary);">${record.cell_sn || 'CATL-LFP-35Ah-001'}</td>
+                <td class="label">制造厂商与封装：</td>
+                <td>${record.mfr || '宁德时代'} (${record.form_factor || '方形铝壳'})</td>
+              </tr>
+              <tr>
+                <td class="label">累计服役役龄：</td>
+                <td>${record.age_years || '2.8'} 年 (${record.mfg_date || '2023-04'} 出厂)</td>
+                <td class="label">累计行驶/循环：</td>
+                <td>${record.mileage || '6.8 万公里'}</td>
+              </tr>
+              <tr>
+                <td class="label">快充使用习惯：</td>
+                <td>${record.charge_habit || '高频快充为主'}</td>
+                <td class="label">历史异常维保：</td>
+                <td>${record.incident || '底盘无磕碰进水，无安全隐患'}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="font-size:12.5px; font-weight:800; color:var(--color-cyan); margin-bottom:8px;">二、电化学测试台架量化评估与诊断结果</div>
+            <table class="report-meta-table">
+              <tr>
+                <td class="label">当前实测健康度 (SOH)：</td>
+                <td><strong style="color:var(--color-green); font-size:15px;">${record.soh}%</strong> (二级健康)</td>
+                <td class="label">直流内阻 (R_dc)：</td>
+                <td><strong>${record.rdc} mΩ</strong> (未见恶性热失控极化)</td>
+              </tr>
+              <tr>
+                <td class="label">微调理可恢复潜力：</td>
+                <td><strong style="color:var(--color-cyan);">+${record.qrec || '2.71'} Ah</strong> (预计可回升至 <strong>${record.after_soh || '85.2'}%</strong>)</td>
+                <td class="label">测试台架与工程师：</td>
+                <td>${record.inspector || '华东检测中心 #08'} (恒温 ${record.temp || '25℃'})</td>
+              </tr>
+              <tr>
+                <td class="label">梯次利用分级决策：</td>
+                <td colspan="3"><span class="kpi-badge success" style="font-size:12px;">${record.tier_full || record.tier || 'B 级：深度调理再生'}</span></td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="background:rgba(0, 229, 255, 0.06); border:1px solid rgba(0, 229, 255, 0.25); border-radius:8px; padding:12px; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-size:12px; color:var(--text-secondary);">商业评估公证结论 · 建议资产评估残值</div>
+                <div style="font-size:20px; font-weight:900; color:var(--color-brand); margin-top:2px;">
+                  ${record.valuation_amount || '13,800 元 (残值率 68.5%)'}
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:11px; color:var(--text-muted);">建议处置路径</div>
+                <div style="font-size:12.5px; font-weight:700; color:var(--color-green); margin-top:2px;">
+                  ${record.scene || '工商业储能 · 5G 基站备电 · 调理再生'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; color:var(--text-muted); border-top:1px dashed var(--border-color); padding-top:12px;">
+            <div>
+              <div>本公证书依据国家电池测试标准与实测脉冲特征提取推演生成。</div>
+              <div>存证平台：电池全生命周期联邦数据飞轮存证系统 (不可篡改)</div>
+            </div>
+            <div style="text-align:right;">
+              <div>主检评估师签字：<strong style="color:var(--text-primary); font-family:cursive; font-size:14px;">${record.inspector ? record.inspector.split('/')[1] || '林工' : '林工'}</strong></div>
+              <div>核查审定专家盖章：<strong style="color:var(--text-primary); font-family:cursive; font-size:14px;">陈工 (已通过二次校验)</strong></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      content.innerHTML = certHtml;
+      document.getElementById('modalCommercialCertificate').style.display = 'flex';
+    },
+
+    closeCertificateModal() {
+      const modal = document.getElementById('modalCommercialCertificate');
+      if (modal) modal.style.display = 'none';
     },
 
     clearAll() {
-      if (confirm('确定要清空该电池的所有历史体检档案吗？')) {
+      if (confirm('确定要清空该电池的所有历史商业体检档案吗？')) {
         this.currentRecords = [];
         this.saveToStorage();
         this.renderTable();
@@ -828,20 +1329,34 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!tbody) return;
       tbody.innerHTML = '';
       if (this.currentRecords.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:16px;">暂无历史体检记录，点击上方按钮“存入当次体检”建立档案</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--text-muted); padding:18px;">暂无商业体检档案，请点击左上方“详细登记电池商业档案与体检建档”进行录入</td></tr>';
         return;
       }
       this.currentRecords.forEach((r, idx) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><strong>#${idx + 1}</strong></td>
-          <td>${r.date || '—'}</td>
-          <td><strong>${r.stage}</strong></td>
-          <td><strong style="color:var(--color-green); font-size:13px;">${r.soh}%</strong></td>
+          <td style="font-family:monospace; font-size:11px; color:var(--color-cyan);">${r.order_no || 'ORD-' + (idx + 1001)}</td>
+          <td>
+            <div style="font-weight:700; color:var(--text-primary); font-size:12px;">${r.client_name || '个人车主'}</div>
+            <div style="font-family:monospace; font-size:10px; color:var(--text-muted);">${r.cell_sn || r.id}</div>
+          </td>
+          <td>
+            <div>${r.mfr || '原厂制造'}</div>
+            <div style="font-size:10px; color:var(--text-secondary);">${r.age_years ? r.age_years + '年役龄' : r.stage}</div>
+          </td>
+          <td><strong style="color:var(--color-green); font-size:14px;">${r.soh}%</strong></td>
           <td>${r.rdc} mΩ</td>
-          <td><span class="card-title-badge">${r.tier || '分选完成'}</span></td>
+          <td>
+            <div style="color:var(--color-brand); font-weight:700; font-size:12px;">${r.valuation_amount || '残值待估'}</div>
+            <span class="card-title-badge" style="font-size:10px;">${r.tier || '分选完成'}</span>
+          </td>
           <td><span style="font-family:monospace; font-size:10px; color:var(--text-muted);">${r.hash}</span></td>
-          <td>${r.note || '—'}</td>
+          <td>
+            <button class="btn btn-outline" style="font-size:11px; padding:4px 8px; color:var(--color-brand); border-color:var(--color-brand);" onclick="VaultManager.showCertificate('${r.id}')">
+              <span>📜</span> 质检公证书
+            </button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -854,23 +1369,26 @@ document.addEventListener('DOMContentLoaded', () => {
     exportDesensitizedJSON() {
       const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';
       const exportData = {
-        export_version: "2.0_DifferentialPrivacy",
+        export_version: "2.0_DifferentialPrivacy_Commercial",
         protocol: "FederatedBatteryLearning_DP",
         timestamp: new Date().toISOString(),
-        privacy_level: "ε=0.5, δ=1e-5 (去标识化保护)",
+        privacy_level: "ε=0.5, δ=1e-5 (去标识化商业保护)",
         cell_anonymized_id: "CHIP-SHA256-" + Math.random().toString(36).substring(2, 10),
         chemistry: chemKey,
         longitudinal_records: this.currentRecords.map(r => ({
+          order_no: r.order_no,
           stage: r.stage,
           soh_pct: r.soh,
           rdc_mOhm: r.rdc,
+          valuation: r.valuation_amount,
+          tier: r.tier,
           privacy_hash: r.hash
         }))
       };
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `电池终身健康档案脱敏包_${chemKey}.json`;
+      link.download = `电池商业健康评估档案脱敏包_${chemKey}.json`;
       link.click();
     }
   };

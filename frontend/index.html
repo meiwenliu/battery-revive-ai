@@ -756,13 +756,13 @@
 
           <div style="background:rgba(0, 229, 255, 0.05); border:1px dashed var(--border-color); border-radius:8px; padding:12px; margin-bottom:12px;">
             <div style="font-size:12px; font-weight:700; color:var(--color-brand); margin-bottom:4px;">
-              📥 建立个人终身健康档案
+              🏢 建立送检电池专属商业资产档案
             </div>
             <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:10px;">
-              将当前在工作台中计算得到的 SOH、直流阻抗与恢复指标一键存入本电池的历史健康病历本中。
+              详细登记送检电池的权属单位、原厂制造规格、役龄里程、历史快充工况及商业评估诉求，生成权威资产档案与健康体检公证书。
             </p>
-            <button class="btn btn-primary" style="width:100%; font-size:12.5px;" onclick="VaultManager.addCurrentEvaluation()">
-              <span>📥</span> 将当次体检写入终身档案库
+            <button class="btn btn-primary" style="width:100%; font-size:12.5px; font-weight:700;" onclick="VaultManager.openIntakeModal()">
+              <span>📋</span> 详细登记电池商业档案与体检建档
             </button>
           </div>
 
@@ -812,13 +812,14 @@
             <thead>
               <tr>
                 <th>序号</th>
-                <th>体检日期</th>
-                <th>体检阶段 / 节点</th>
+                <th>送检单号</th>
+                <th>委托客户 / 电池序列号</th>
+                <th>原厂规格 / 役龄</th>
                 <th>SOH 健康度</th>
-                <th>直流阻抗 R_dc</th>
-                <th>梯次利用评级</th>
-                <th>隐私哈希编码 (SHA-256)</th>
-                <th>备注说明</th>
+                <th>直流阻抗</th>
+                <th>商业估值与评级</th>
+                <th>脱敏哈希 (SHA-256)</th>
+                <th>商业质检公证书</th>
               </tr>
             </thead>
             <tbody id="vaultRecordsTableBody"></tbody>
@@ -864,6 +865,209 @@
     </section>
 
   </main>
+
+  <!-- ==================== 模态弹窗 1: 商业级电池档案录入与全维资产评估登记表 ==================== -->
+  <div class="modal-backdrop" id="modalBatteryIntake">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>📋</span> 商业级电池档案录入与全维资产评估登记表
+        </div>
+        <button class="modal-close" onclick="VaultManager.closeIntakeModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 快捷案例导入 -->
+        <div style="background:rgba(0, 229, 255, 0.05); border:1px solid rgba(0, 229, 255, 0.2); border-radius:6px; padding:10px 12px;">
+          <div style="font-size:11.5px; font-weight:700; color:var(--color-brand); margin-bottom:6px;">
+            ⚡ 快捷载入典型商业委托登记案例：
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button class="btn btn-outline" style="font-size:11px; padding:4px 8px;" onclick="VaultManager.fillIntakePreset('preset_ev_user')">
+              🚗 案例一：个人车主二手新能源车交易公证
+            </button>
+            <button class="btn btn-outline" style="font-size:11px; padding:4px 8px;" onclick="VaultManager.fillIntakePreset('preset_storage_plant')">
+              ⚡ 案例二：储能电站 500kWh 退役模组分选
+            </button>
+            <button class="btn btn-outline" style="font-size:11px; padding:4px 8px;" onclick="VaultManager.fillIntakePreset('preset_telecom_tower')">
+              📶 案例三：5G通信基站备电年度巡检评估
+            </button>
+          </div>
+        </div>
+
+        <!-- 一、送检委托与商业权属 -->
+        <div class="modal-section-title">🏢 一、送检委托与商业权属档案</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label">委托客户 / 单位名称 <span style="color:var(--color-rose);">*</span></label>
+            <input type="text" class="form-input" id="intakeClientName" value="顺达新能源智慧物流 (个人车主: 张先生)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">委托检测流水单号</label>
+            <input type="text" class="form-input" id="intakeOrderNo" value="ORD-2026-VAL-0902">
+          </div>
+          <div class="form-group">
+            <label class="form-label">联系电话 / 邮箱</label>
+            <input type="text" class="form-input" id="intakeContact" value="138****8890 (client@ev-service.cn)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">送检商业目的</label>
+            <select class="form-select" id="intakePurpose">
+              <option value="二手车交易残值评估与公证" selected>二手车交易残值评估与公证</option>
+              <option value="退役动力电池梯次利用储能准入评估">退役动力电池梯次利用储能准入评估</option>
+              <option value="储能电站健康安全年度巡检与延保">储能电站健康安全年度巡检与延保</option>
+              <option value="微调理再生恢复效果工程验收">微调理再生恢复效果工程验收</option>
+              <option value="电池资产评估与质押融资定价">电池资产评估与质押融资定价</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 二、送检电池资产出厂档案 -->
+        <div class="modal-section-title">🔋 二、送检电池物理出厂档案</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label">电池专属硬件序列号 (SN / VIN) <span style="color:var(--color-rose);">*</span></label>
+            <input type="text" class="form-input" id="intakeCellSn" value="CATL-LFP-35Ah-2026-A0982">
+          </div>
+          <div class="form-group">
+            <label class="form-label">原厂制造厂商</label>
+            <select class="form-select" id="intakeManufacturer">
+              <option value="宁德时代 (CATL)" selected>宁德时代 (CATL)</option>
+              <option value="比亚迪 (FinDreams)">比亚迪 (FinDreams)</option>
+              <option value="中创新航 (CALB)">中创新航 (CALB)</option>
+              <option value="国轩高科 (Gotion)">国轩高科 (Gotion)</option>
+              <option value="亿纬锂能 (EVE)">亿纬锂能 (EVE)</option>
+              <option value="蜂巢能源 (SVOLT)">蜂巢能源 (SVOLT)</option>
+              <option value="中科海钠 (HiNa Na-ion)">中科海钠 (HiNa Na-ion)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">电芯封装结构形式</label>
+            <select class="form-select" id="intakeFormFactor">
+              <option value="方形铝壳 (Prismatic)" selected>方形铝壳 (Prismatic)</option>
+              <option value="圆柱型 (Cylindrical 18650/21700)">圆柱型 (Cylindrical 18650/21700)</option>
+              <option value="软包叠片 (Pouch)">软包叠片 (Pouch)</option>
+              <option value="大圆柱 (4680)">大圆柱 (4680)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">出厂生产年月</label>
+            <input type="month" class="form-input" id="intakeMfgDate" value="2023-04">
+          </div>
+          <div class="form-group">
+            <label class="form-label">原始标称额定容量 (Ah)</label>
+            <input type="number" step="0.1" class="form-input" id="intakeNomCap" value="35.0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">标称额定电压 (V)</label>
+            <input type="number" step="0.01" class="form-input" id="intakeNomVolt" value="3.20">
+          </div>
+        </div>
+
+        <!-- 三、历史服役履历与工况环境背景 -->
+        <div class="modal-section-title">⏱️ 三、历史服役履历与工况环境背景</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label">累计服役役龄 (年)</label>
+            <input type="number" step="0.1" class="form-input" id="intakeAgeYears" value="2.8">
+          </div>
+          <div class="form-group">
+            <label class="form-label">累计行驶里程 / 循环</label>
+            <input type="text" class="form-input" id="intakeMileage" value="6.8 万公里 / 1,450 循环">
+          </div>
+          <div class="form-group">
+            <label class="form-label">历史主要服役环境</label>
+            <select class="form-select" id="intakeEnvironment">
+              <option value="常温普通工况 (15~28℃)" selected>常温普通工况 (15~28℃)</option>
+              <option value="南方夏季高温高湿 (35~42℃)">南方夏季高温高湿 (35~42℃)</option>
+              <option value="北方冬季极寒低温 (-10~-25℃)">北方冬季极寒低温 (-10~-25℃)</option>
+              <option value="沿海高盐雾强腐蚀环境">沿海高盐雾强腐蚀环境</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">快充占比习惯</label>
+            <select class="form-select" id="intakeChargeHabit">
+              <option value="高频快充为主 (超快充>70%)" selected>高频快充为主 (超快充>70%)</option>
+              <option value="均衡混合充电 (快充40% / 慢充60%)">均衡混合充电 (快充40% / 慢充60%)</option>
+              <option value="夜间慢充为主 (交流慢充>85%)">夜间慢充为主 (交流慢充>85%)</option>
+              <option value="常年浅充浅放浮充 (储能备电)">常年浅充浅放浮充 (储能备电)</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">历史异常与维保记录</label>
+            <input type="text" class="form-input" id="intakeIncidentRecord" value="底盘无磕碰，无进水涉水记录，曾做高压系统定期二次校验">
+          </div>
+        </div>
+
+        <!-- 四、当次实测工况与测试数据 -->
+        <div class="modal-section-title">🔬 四、当次实测工况与核心电化学特征 (自动载入当前测试值)</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:6px; padding:10px;">
+          <div class="form-group">
+            <label class="form-label">开路电压 U₀ (V)</label>
+            <input type="number" step="0.0001" class="form-input" id="intakeValU0" value="3.2850">
+          </div>
+          <div class="form-group">
+            <label class="form-label">放电内阻 Rdc (Ω)</label>
+            <input type="number" step="0.0001" class="form-input" id="intakeValRdc" value="0.0150">
+          </div>
+          <div class="form-group">
+            <label class="form-label">放电容量 (Ah)</label>
+            <input type="number" step="0.01" class="form-input" id="intakeValQdis" value="26.40">
+          </div>
+          <div class="form-group">
+            <label class="form-label">极化电压 η (V)</label>
+            <input type="number" step="0.001" class="form-input" id="intakeValEta" value="-0.0300">
+          </div>
+        </div>
+
+        <!-- 五、商业评估与二次服役估值 -->
+        <div class="modal-section-title">💰 五、商业资产评估预设与估价基准</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label">检测台架与工程师编号</label>
+            <input type="text" class="form-input" id="intakeInspector" value="华东检测中心 3号台架 / 工程师 #08">
+          </div>
+          <div class="form-group">
+            <label class="form-label">测试环境温度条件</label>
+            <input type="text" class="form-input" id="intakeTemp" value="25.0 ℃ 标准恒温箱">
+          </div>
+          <div class="form-group">
+            <label class="form-label">同体系新电芯当期市场基准价</label>
+            <input type="text" class="form-input" id="intakeMarketPrice" value="550 元 / kWh (当期参考基准)">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="VaultManager.closeIntakeModal()">取消</button>
+        <button class="btn btn-primary" style="font-weight:700;" onclick="VaultManager.submitIntakeModal()">
+          <span>✅</span> 确认建档并生成商业质检评估公证书
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态弹窗 2: 商业资产评估与质检公证书 ==================== -->
+  <div class="modal-backdrop" id="modalCommercialCertificate">
+    <div class="modal-dialog" style="max-width:760px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>📜</span> 新能源动力与储能电池健康状态商业资产评估公证书
+        </div>
+        <button class="modal-close" onclick="VaultManager.closeCertificateModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" id="certificateModalContent" style="padding:24px;">
+        <!-- 动态注入公证书内容 -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="VaultManager.closeCertificateModal()">关闭</button>
+        <button class="btn btn-success" onclick="window.print()">🖨️ 打印 / 导出评估公证书</button>
+      </div>
+    </div>
+  </div>
 
   <!-- JS 脚本引入 -->
   <script src="js/calculation_engine.js?v=20260831_v3"></script>
