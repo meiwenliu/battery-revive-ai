@@ -126,7 +126,7 @@ class RealtimeOscilloscope {
       ctx.stroke();
     }
 
-    // 2. 绘制零基线
+    // 2. 绘制零位参考线
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.setLineDash([4, 4]);
     ctx.beginPath();

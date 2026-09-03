@@ -182,6 +182,36 @@
             <span class="card-title-badge">双模型独立配置</span>
           </div>
 
+          <!-- 核心：测试数据源与测量样本库接入 (工程测量与实测溯源闭环) -->
+          <div style="background:linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(2, 132, 199, 0.04) 100%); border:1px solid rgba(0, 229, 255, 0.3); border-radius:8px; padding:10px 12px; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12px; font-weight:800; color:var(--color-brand);">🔬 测量数据接入与实测样本库</span>
+              <span class="kpi-badge info" style="font-size:10px;">有据可测 · 真实数据</span>
+            </div>
+            
+            <div class="form-group" style="margin-bottom:8px;">
+              <label class="form-label" style="font-size:11px; color:var(--text-secondary);">① 快速调取台架实测标定电芯：</label>
+              <select class="form-select" id="selBenchmarkCell" onchange="loadBenchmarkCell(this.value)" style="font-size:11.5px; font-weight:600; border-color:var(--color-brand);">
+                <option value="retire_lfp" selected>🔷 [实测#3] 磷酸铁锂 (LFP) 车载退役电芯 (SOH≈79%, 推荐调理)</option>
+                <option value="fresh_lfp">🟢 [实测#1] 磷酸铁锂 (LFP) 出厂全新电芯 (SOH≈98%, 储能优选)</option>
+                <option value="healthy_lfp">🔵 [实测#2] 磷酸铁锂 (LFP) 在役健康电芯 (SOH≈89%, 高敏备电)</option>
+                <option value="echelon_ncm">🟡 [实测#4] 三元高镍 (NCM) 梯次轻载电芯 (SOH≈69%, 建议轻载)</option>
+                <option value="dead_lfp">🔴 [实测#5] 磷酸铁锂 (LFP) 深度老化失效电芯 (SOH≈54%, 建议提锂)</option>
+                <option value="naion_proto">🟣 [实测#6] 钠离子电池 (Na-ion) 试验电芯 (SOH≈88%, 调理再生)</option>
+              </select>
+            </div>
+
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              <input type="file" id="csvFileInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(event)">
+              <button class="btn btn-outline" style="flex:1; font-size:11px; padding:6px 8px;" onclick="document.getElementById('csvFileInput').click()">
+                <span>📂</span> 导入测试仪 CSV
+              </button>
+              <button class="btn btn-outline" style="flex:1; font-size:11px; padding:6px 8px;" onclick="syncFromOscilloscope()">
+                <span>⚡</span> 示波器采样同步
+              </button>
+            </div>
+          </div>
+
           <!-- 模型自主选择 -->
           <div class="form-group">
             <label class="form-label" style="color:var(--color-brand); font-weight:700;">🧠 SOH 诊断模型选择</label>
@@ -327,6 +357,18 @@
           <!-- 1. 活跃决策看板（针对已完成全流程标定的体系，如磷酸铁锂） -->
           <div id="dashboardActiveContent" style="display:flex; flex-direction:column; gap:16px;">
             
+            <!-- 测量数据溯源与物理特征工程状态条 -->
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; flex-wrap:wrap; gap:6px;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="color:var(--color-brand); font-weight:700;">📊 测量数据源：</span>
+                <span id="provenanceSourceName" style="color:var(--text-primary); font-weight:600;">【实测#3】车载退役模组实测脉冲数据 (1800次循环)</span>
+              </div>
+              <div style="display:flex; gap:10px; color:var(--text-muted); font-size:11px;">
+                <span>采样：<strong style="color:var(--color-cyan);" id="provenanceSampling">极速充放脉冲 (CH01通道)</strong></span>
+                <span>特征提取：<strong style="color:var(--color-green);" id="provenanceConfidence">已提取8项物理特征 (置信度99.8%)</strong></span>
+              </div>
+            </div>
+
             <!-- 四级分选决策大卡片 -->
             <div class="tier-decision-card class-b" id="echelonDecisionCard">
               <div class="tier-info">
@@ -490,6 +532,9 @@
               <button class="btn-pulse" onclick="injectPulse('dis_20c')">-2.0C 脉冲</button>
               <button class="btn-pulse" onclick="injectPulse('relax')">撤载松弛</button>
             </div>
+            <button class="btn btn-success" style="width:100%; margin-top:10px; font-weight:700; font-size:12px;" onclick="syncOscilloscopeToDiagnosis()">
+              <span>⚡</span> 将当前示波器实时测量波形特征同步至诊断中心并计算
+            </button>
           </div>
         </div>
 
