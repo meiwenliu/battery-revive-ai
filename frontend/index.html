@@ -25,7 +25,7 @@
       <div class="brand-logo">焕</div>
       <div class="brand-text">
         <h1>焕芯·电愈智策</h1>
-        <p>多材料体系·储能与循环电池智能快速诊断、容量恢复预估与低碳再生决策系统</p>
+        <p>多体系电池智能快速诊断与低碳循环决策平台</p>
       </div>
     </div>
     
@@ -45,45 +45,7 @@
     </div>
   </header>
 
-  <!-- 2. 全流程六阶微观-宏观数字孪生流路导航卡 -->
-  <div class="pipeline-flow-bar">
-    <div class="pipeline-step active" data-tab-target="tab-realtime">
-      <span class="pipeline-step-num">1</span>
-      <span>实时脉冲采集</span>
-    </div>
-    <span class="pipeline-arrow">➔</span>
-    <div class="pipeline-step" data-tab-target="tab-m1">
-      <span class="pipeline-step-num">2</span>
-      <span>8项物理特征提取</span>
-    </div>
-    <span class="pipeline-arrow">➔</span>
-    <div class="pipeline-step" data-tab-target="tab-m1">
-      <span class="pipeline-step-num">3</span>
-      <span>SOH 智能诊断</span>
-    </div>
-    <span class="pipeline-arrow">➔</span>
-    <div class="pipeline-step" data-tab-target="tab-m2">
-      <span class="pipeline-step-num">4</span>
-      <span>容量恢复预测</span>
-    </div>
-    <span class="pipeline-arrow">➔</span>
-    <div class="pipeline-step" data-tab-target="tab-m2">
-      <span class="pipeline-step-num">5</span>
-      <span>四级分选决策</span>
-    </div>
-    <span class="pipeline-arrow">➔</span>
-    <div class="pipeline-step" data-tab-target="tab-m3">
-      <span class="pipeline-step-num">6</span>
-      <span>制造端碳减排量化</span>
-    </div>
-    <span class="pipeline-arrow">➔</span>
-    <div class="pipeline-step" data-tab-target="tab-vault">
-      <span class="pipeline-step-num">7</span>
-      <span>健康档案与数据飞轮</span>
-    </div>
-  </div>
-
-  <!-- 3. 主模块标签页切换 (清晰、直观、按需切换) -->
+  <!-- 主模块标签页导航 -->
   <nav class="nav-tabs">
     <button class="nav-tab-btn active" data-tab="tab-dashboard">
       <span>📊</span> 全流程工作台
@@ -108,20 +70,13 @@
     </button>
   </nav>
 
-  <!-- 4. 标准样例快捷栏与全体系支持说明 -->
+  <!-- 标准实测样例快捷栏 -->
   <aside class="sample-bar">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <span style="color:var(--color-green); font-weight:700;">★ 示例样本：</span>
-    </div>
+    <span style="color:var(--color-green); font-weight:700; font-size:12px;">⚡ 实测示例：</span>
     <div class="sample-actions">
-      <button class="btn-sample" onclick="loadPresetSample('pulsebat')">① 35Ah 脉冲极速诊断样本 (50% SOC)</button>
-      <button class="btn-sample" onclick="loadPresetSample('recovery62')">② 18650 循环恢复样本 (22只典型电芯)</button>
-      <button class="btn-sample" onclick="loadPresetSample('echelon_batch')">③ 100只批量电芯性能分选批次</button>
-      <a href="../data/data_dictionary.md" target="_blank" class="btn-sample" style="color:var(--color-amber);">📖 数据字典说明</a>
-    </div>
-    <div style="margin-left:auto; display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-secondary);">
-      <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--color-brand);"></span>
-      <span>兼容 LFP / 三元 / 钠电等全材料体系 · 覆盖工商业与电网储能等全场景</span>
+      <button class="btn-sample" onclick="loadPresetSample('pulsebat')">① 35Ah 极速脉冲诊断</button>
+      <button class="btn-sample" onclick="loadPresetSample('recovery62')">② 18650 循环恢复预测</button>
+      <button class="btn-sample" onclick="loadPresetSample('echelon_batch')">③ 100只模组批量分选</button>
     </div>
   </aside>
 
@@ -182,70 +137,68 @@
             <span class="card-title-badge">双模型独立配置</span>
           </div>
 
-          <!-- 核心：测试数据源与测量样本库接入 (工程测量与实测溯源闭环) -->
-          <div style="background:linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(2, 132, 199, 0.04) 100%); border:1px solid rgba(0, 229, 255, 0.3); border-radius:8px; padding:10px 12px; margin-bottom:14px;">
+          <!-- 测量数据源与标定电芯库 -->
+          <div style="background:rgba(0, 229, 255, 0.05); border:1px solid rgba(0, 229, 255, 0.25); border-radius:6px; padding:8px 10px; margin-bottom:12px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <span style="font-size:12px; font-weight:800; color:var(--color-brand);">🔬 测量数据接入与实测样本库</span>
-              <span class="kpi-badge info" style="font-size:10px;">有据可测 · 真实数据</span>
+              <span style="font-size:11.5px; font-weight:700; color:var(--color-brand);">🔬 标定电芯实测库</span>
+              <span class="kpi-badge info" style="font-size:10px;">台架实测</span>
             </div>
             
-            <div class="form-group" style="margin-bottom:8px;">
-              <label class="form-label" style="font-size:11px; color:var(--text-secondary);">① 快速调取台架实测标定电芯：</label>
-              <select class="form-select" id="selBenchmarkCell" onchange="loadBenchmarkCell(this.value)" style="font-size:11.5px; font-weight:600; border-color:var(--color-brand);">
-                <option value="" disabled>-- 快速调取台架实测标定电芯 --</option>
-                <option value="retire_lfp" selected>🔷 [实测#3] 磷酸铁锂 (LFP) 车载退役电芯 (SOH≈79%, 推荐调理)</option>
-                <option value="fresh_lfp">🟢 [实测#1] 磷酸铁锂 (LFP) 出厂全新电芯 (SOH≈98%, 储能优选)</option>
-                <option value="healthy_lfp">🔵 [实测#2] 磷酸铁锂 (LFP) 在役健康电芯 (SOH≈89%, 高敏备电)</option>
-                <option value="echelon_ncm">🟡 [实测#4] 三元高镍 (NCM) 梯次轻载电芯 (SOH≈69%, 建议轻载)</option>
-                <option value="dead_lfp">🔴 [实测#5] 磷酸铁锂 (LFP) 深度老化失效电芯 (SOH≈54%, 建议提锂)</option>
-                <option value="naion_proto">🟣 [实测#6] 钠离子电池 (Na-ion) 试验电芯 (SOH≈88%, 调理再生)</option>
-                <option value="sic_aging">🔶 [实测#7] 硅碳复合 (NCM-SiC) 衰退电芯 (SOH≈78%, 推荐调理)</option>
+            <div class="form-group" style="margin-bottom:6px;">
+              <select class="form-select" id="selBenchmarkCell" onchange="loadBenchmarkCell(this.value)" style="font-size:11px; font-weight:600; border-color:var(--color-brand);">
+                <option value="retire_lfp" selected>🔷 标定#3: LFP 退役 (SOH 79%)</option>
+                <option value="fresh_lfp">🟢 标定#1: LFP 全新 (SOH 98%)</option>
+                <option value="healthy_lfp">🔵 标定#2: LFP 在役 (SOH 89%)</option>
+                <option value="echelon_ncm">🟡 标定#4: NCM 轻载 (SOH 69%)</option>
+                <option value="dead_lfp">🔴 标定#5: LFP 失效 (SOH 54%)</option>
+                <option value="naion_proto">🟣 标定#6: 钠电试验 (SOH 88%)</option>
+                <option value="sic_aging">🔶 标定#7: 硅碳衰退 (SOH 78%)</option>
               </select>
             </div>
 
-            <div style="display:flex; gap:6px; margin-top:6px;">
+            <div style="display:flex; gap:6px;">
               <input type="file" id="csvFileInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(event)">
-              <button class="btn btn-outline" style="flex:1; font-size:11px; padding:6px 8px;" onclick="document.getElementById('csvFileInput').click()">
-                <span>📂</span> 导入测试仪 CSV
+              <button class="btn btn-outline" style="flex:1; font-size:10.5px; padding:5px 6px;" onclick="document.getElementById('csvFileInput').click()">
+                📂 导入 CSV
               </button>
-              <button class="btn btn-outline" style="flex:1; font-size:11px; padding:6px 8px;" onclick="syncFromOscilloscope()">
-                <span>⚡</span> 示波器采样同步
+              <button class="btn btn-outline" style="flex:1; font-size:10.5px; padding:5px 6px;" onclick="syncFromOscilloscope()">
+                ⚡ 示波器同步
               </button>
             </div>
           </div>
 
           <!-- 模型自主选择 -->
-          <div class="form-group">
-            <label class="form-label" style="color:var(--color-brand); font-weight:700;">🧠 SOH 诊断模型选择</label>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label class="form-label" style="color:var(--color-brand); font-weight:700; font-size:11px;">🧠 SOH 诊断模型</label>
             <select class="form-select" id="selM1Model">
-              <option value="xgboost">统一梯度提升决策树 (XGBoost) [推荐]</option>
-              <option value="random_forest">随机森林回归 (Random Forest)</option>
-              <option value="ridge">岭回归 (Ridge Regression)</option>
+              <option value="xgboost">梯度提升树 (XGBoost) [推荐]</option>
+              <option value="random_forest">随机森林 (Random Forest)</option>
+              <option value="ridge">岭回归 (Ridge)</option>
               <option value="pls">偏最小二乘 (PLS)</option>
               <option value="svr">支持向量机 (SVR)</option>
               <option value="mean_baseline">均值参考基准 (对照)</option>
             </select>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" style="color:var(--color-green); font-weight:700;">🧠 容量恢复预测模型</label>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label class="form-label" style="color:var(--color-green); font-weight:700; font-size:11px;">🧠 容量恢复预测模型</label>
             <select class="form-select" id="selM2Model">
-              <option value="elasticnet">弹性网络回归 (ElasticNet) [推荐]</option>
+              <option value="elasticnet">弹性网络 (ElasticNet) [推荐]</option>
               <option value="linear">多元线性回归 (Linear)</option>
               <option value="lasso">套索回归 (Lasso)</option>
               <option value="gpr">高斯过程回归 (GPR)</option>
-              <option value="mean_baseline">历史均值参考基准 (对照)</option>
+              <option value="mean_baseline">均值参考基准 (对照)</option>
             </select>
           </div>
 
           <!-- 材料体系选择 -->
-          <div class="form-group">
-            <label class="form-label" style="color:var(--color-cyan); font-weight:700; margin-bottom:4px;">🔬 材料体系选择</label>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label class="form-label" style="color:var(--color-cyan); font-weight:700; font-size:11px;">🔬 材料体系</label>
             <select class="form-select" id="selBatteryChemistry">
-              <option value="lfp" selected>磷酸铁锂 (LFP) 体系</option>
-              <option value="ncm">三元高镍 (NCM / NCA) 体系</option>
-              <option value="naion">钠离子电池 (Na-ion) 体系</option>
-              <option value="sic">硅碳复合体系 (NCM-SiC)</option>
+              <option value="lfp" selected>磷酸铁锂 (LFP)</option>
+              <option value="ncm">三元高镍 (NCM)</option>
+              <option value="naion">钠离子电池 (Na-ion)</option>
+              <option value="sic">硅碳复合 (NCM-SiC)</option>
             </select>
           </div>
 
@@ -359,24 +312,24 @@
           <!-- 1. 活跃决策看板（针对已完成全流程标定的体系，如磷酸铁锂） -->
           <div id="dashboardActiveContent" style="display:flex; flex-direction:column; gap:16px;">
             
-            <!-- 测量数据溯源与物理特征工程状态条 -->
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; flex-wrap:wrap; gap:6px;">
+            <!-- 测量数据溯源状态条 -->
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:6px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center; font-size:11px; flex-wrap:wrap; gap:6px;">
               <div style="display:flex; align-items:center; gap:6px;">
-                <span style="color:var(--color-brand); font-weight:700;">📊 测量数据源：</span>
-                <span id="provenanceSourceName" style="color:var(--text-primary); font-weight:600;">【实测#3】车载退役模组实测脉冲数据 (1800次循环)</span>
+                <span style="color:var(--color-brand); font-weight:700;">数据源：</span>
+                <span id="provenanceSourceName" style="color:var(--text-primary); font-weight:600;">退役模组脉冲 (1800次循环)</span>
               </div>
               <div style="display:flex; gap:10px; color:var(--text-muted); font-size:11px;">
-                <span>采样：<strong style="color:var(--color-cyan);" id="provenanceSampling">极速充放脉冲 (CH01通道)</strong></span>
-                <span>特征提取：<strong style="color:var(--color-green);" id="provenanceConfidence">已提取8项物理特征 (置信度99.8%)</strong></span>
+                <span>采样：<strong style="color:var(--color-cyan);" id="provenanceSampling">CH01 脉冲</strong></span>
+                <span>状态：<strong style="color:var(--color-green);" id="provenanceConfidence">8项物理特征就绪</strong></span>
               </div>
             </div>
 
             <!-- 四级分选决策大卡片 -->
             <div class="tier-decision-card class-b" id="echelonDecisionCard">
               <div class="tier-info">
-                <h3 id="valEchelonTierTitle">B 级：深度调理再生 + 储能/高敏备电应用</h3>
-                <p id="valEchelonScene">场景：工商业与户用储能 · 5G 通信基站备电 · 离网微电网储能</p>
-                <p style="margin-top:2px;" id="valEchelonTreatment">建议：执行 3.6V 恒压充电微调理激活活性锂</p>
+                <h3 id="valEchelonTierTitle">B 级：深度调理再生 · 储能/备电应用</h3>
+                <p id="valEchelonScene">场景：工商业储能 · 通信基站备电 · 微电网</p>
+                <p style="margin-top:2px;" id="valEchelonTreatment">建议：执行 3.6V 恒压调理激活活性锂</p>
               </div>
               <div class="tier-badge-large" id="valEchelonEcoValue" style="color:var(--color-brand);">
                 残值提升 +25%
@@ -387,7 +340,7 @@
             <div class="grid-2-1" style="margin-bottom:0;">
               <div class="card" style="padding:10px;">
                 <div class="card-title" style="font-size:12px; margin-bottom:0;">
-                  <span>⏱️</span> SOH 动态健康能量表
+                  <span>⏱️</span> SOH 动态能量表
                 </div>
                 <div class="chart-container short" id="sohGaugeChart" style="height:150px;"></div>
                 <div style="text-align:center; font-size:11.5px; font-weight:700; color:var(--text-secondary);" id="valHealthGrade">良好 (二级健康)</div>
@@ -408,31 +361,31 @@
                   <div style="font-size:19px; font-weight:800; color:var(--color-amber);" id="valRPI">16.80%</div>
                 </div>
                 <div class="card" style="padding:8px 10px;">
-                  <div style="font-size:10.5px; color:var(--text-secondary);">调理后预期 SOH</div>
+                  <div style="font-size:10.5px; color:var(--text-secondary);">预期调理后 SOH</div>
                   <div style="font-size:19px; font-weight:800; color:var(--color-green);" id="valAfterSOH">82.20%</div>
                 </div>
               </div>
             </div>
 
-            <!-- 送检电芯微观物理机理特征解析 (单电芯实测提取值) -->
-            <div class="card" style="padding:12px 14px;">
-              <div class="card-header" style="margin-bottom:8px;">
-                <div class="card-title" style="font-size:13px;">
-                  <span>🔬</span> <span id="valCellPhysicsTitle">送检电芯微观电化学物理特征解析</span>
+            <!-- 送检电芯微观物理特征提取 -->
+            <div class="card" style="padding:10px 12px;">
+              <div class="card-header" style="margin-bottom:6px;">
+                <div class="card-title" style="font-size:12px;">
+                  <span>🔬</span> <span id="valCellPhysicsTitle">电化学微观物理特征</span>
                 </div>
-                <span class="card-title-badge" id="valCellPhysicsBadge" style="color:var(--color-green);">特征工程提取就绪</span>
+                <span class="card-title-badge" id="valCellPhysicsBadge" style="color:var(--color-green);">8项特征就绪</span>
               </div>
               
-              <div id="cellPhysicsDetailGrid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;">
-                <!-- 动态注入单只电芯的 8 项物理特征与电化学机理说明 -->
+              <div id="cellPhysicsDetailGrid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+                <!-- 动态注入单只电芯的 8 项物理特征 -->
               </div>
             </div>
 
-            <!-- 碳减排生态等效看板 -->
-            <div class="card" style="padding:12px 14px;">
-              <div class="card-header" style="margin-bottom:8px;">
-                <div class="card-title" style="font-size:13px;">
-                  <span>🌱</span> <span id="valEcoHeader">制造端碳减排规避量化成果 (11.20 kWh 模组等效)</span>
+            <!-- 制造端碳减排看板 -->
+            <div class="card" style="padding:10px 12px;">
+              <div class="card-header" style="margin-bottom:6px;">
+                <div class="card-title" style="font-size:12px;">
+                  <span>🌱</span> <span id="valEcoHeader">制造端碳减排规避量化</span>
                 </div>
               </div>
               
@@ -455,7 +408,7 @@
                 <div class="eco-item">
                   <div class="eco-icon">🌲</div>
                   <div class="eco-num" id="valTrees">23.1 棵</div>
-                  <div class="eco-desc">年吸收碳汇</div>
+                  <div class="eco-desc">年等效植树</div>
                 </div>
               </div>
             </div>
@@ -574,8 +527,8 @@
     <section class="tab-pane" id="tab-m2">
       <div class="card" style="margin-bottom:16px;">
         <div class="card-header">
-          <div class="card-title"><span>🎯</span> 22 只典型循环电芯恢复预测值与 90% 保角区间</div>
-          <span class="card-title-badge">已完成留一验证 (90%置信覆盖)</span>
+          <div class="card-title"><span>🎯</span> 典型循环电芯恢复预测与 90% 保角区间</div>
+          <span class="card-title-badge">留一交叉验证 (90%置信覆盖)</span>
         </div>
         <div class="chart-container" id="m2ConformalChart"></div>
       </div>
@@ -585,7 +538,7 @@
         <div class="laser-scan-bar"></div>
         <div class="pack-matrix-header">
           <div style="font-weight:700; font-size:12px;">
-            <span>🔋</span> <span id="valPackMatrixHeader">国家标准储能梯次退役模组 100 只电芯批量阵列 (点击任意电芯可在控制台回放)</span>
+            <span>🔋</span> <span id="valPackMatrixHeader">储能模组 100 只电芯阵列 (点击可回放特征)</span>
           </div>
           <div class="pack-legend" id="packLegendCounts">
             <div class="legend-item"><span class="legend-color class-a"></span><span id="legendCountA">A级(35)</span></div>
@@ -600,7 +553,7 @@
       <div class="grid-2-1">
         <div class="card">
           <div class="card-header">
-            <div class="card-title"><span>📋</span> 100 只批量电芯循环再生分选明细</div>
+            <div class="card-title"><span>📋</span> 100 只模组批量分选明细</div>
             <button class="btn btn-success" style="padding:3px 10px; font-size:11.5px;" onclick="exportBatchCSV()">📥 导出 CSV</button>
           </div>
 
@@ -747,29 +700,26 @@
             <div class="card-title"><span>📝</span> 体检归档与场景回放</div>
           </div>
 
-          <div style="background:rgba(0, 229, 255, 0.05); border:1px dashed var(--border-color); border-radius:8px; padding:12px; margin-bottom:12px;">
-            <div style="font-size:12px; font-weight:700; color:var(--color-brand); margin-bottom:4px;">
-              🏢 建立送检电池专属商业资产档案
+          <div style="background:rgba(0, 229, 255, 0.05); border:1px dashed var(--border-color); border-radius:6px; padding:10px; margin-bottom:10px;">
+            <div style="font-size:11.5px; font-weight:700; color:var(--color-brand); margin-bottom:4px;">
+              🏢 送检电池商业档案登记
             </div>
-            <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:10px;">
-              详细登记送检电池的权属单位、原厂制造规格、役龄里程、历史快充工况及商业评估诉求，生成权威资产档案与健康体检公证书。
-            </p>
-            <button class="btn btn-primary" style="width:100%; font-size:12.5px; font-weight:700;" onclick="VaultManager.openIntakeModal()">
-              <span>📋</span> 详细登记电池商业档案与体检建档
+            <button class="btn btn-primary" style="width:100%; font-size:11.5px; font-weight:700;" onclick="VaultManager.openIntakeModal()">
+              <span>📋</span> 登记电池档案与质检公证
             </button>
           </div>
 
           <div class="form-group">
-            <label class="form-label" style="font-weight:700; color:var(--text-secondary);">⚡ 载入典型全周期服役场景历史轨迹</label>
+            <label class="form-label" style="font-weight:700; color:var(--text-secondary); font-size:11px;">⚡ 全周期服役历史轨迹场景</label>
             <div style="display:flex; flex-direction:column; gap:6px;">
-              <button class="btn btn-outline" style="justify-content:flex-start; font-size:12px;" onclick="VaultManager.loadPreset('ev_3yr')">
-                <span>🚗</span> 场景一：新能源车役龄3年全周期体检 (含调理再生)
+              <button class="btn btn-outline" style="justify-content:flex-start; font-size:11px; padding:6px 8px;" onclick="VaultManager.loadPreset('ev_3yr')">
+                <span>🚗</span> 场景一：新能源车 3 年全周期轨迹
               </button>
-              <button class="btn btn-outline" style="justify-content:flex-start; font-size:12px;" onclick="VaultManager.loadPreset('base_station')">
-                <span>📶</span> 场景二：5G 通信基站备电储能 3 年多节点衰退轨迹
+              <button class="btn btn-outline" style="justify-content:flex-start; font-size:11px; padding:6px 8px;" onclick="VaultManager.loadPreset('base_station')">
+                <span>📶</span> 场景二：5G 通信基站 3 年衰退轨迹
               </button>
-              <button class="btn btn-outline" style="justify-content:flex-start; font-size:12px;" onclick="VaultManager.loadPreset('grid_storage')">
-                <span>⚡</span> 场景三：电网侧高频调峰电站 3600 次循环退役轨迹
+              <button class="btn btn-outline" style="justify-content:flex-start; font-size:11px; padding:6px 8px;" onclick="VaultManager.loadPreset('grid_storage')">
+                <span>⚡</span> 场景三：电网调峰 3600 次循环轨迹
               </button>
             </div>
           </div>
@@ -820,27 +770,27 @@
         </div>
       </div>
 
-      <!-- 4. 双重核心价值学术与商业叙事卡片 -->
-      <div class="grid-2" style="margin-top:16px; margin-bottom:0;">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title" style="color:var(--color-cyan);"><span>👤</span> 微观尺度赋能：车主与储能业主专属“电子病历本”</div>
+      <!-- 4. 双重核心价值 -->
+      <div class="grid-2" style="margin-top:14px; margin-bottom:0;">
+        <div class="card" style="padding:10px 12px;">
+          <div class="card-header" style="margin-bottom:4px;">
+            <div class="card-title" style="color:var(--color-cyan); font-size:12px;"><span>👤</span> 微观尺度赋能：电池专属健康电子病历</div>
           </div>
-          <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.7;">
-            • <strong>消除二手交易信息不对称</strong>：打破传统退役电池“一刀切盲测”僵局，清晰掌握历次衰减斜率（d<i>SOH</i>/d<i>t</i>）与健康拐点；<br>
-            • <strong>量化调理再生性能优势</strong>：直观对比调理前后真实恢复量，为高价值梯次储能服役提供可追溯的科学残值依据；<br>
-            • <strong>预防性安全预警</strong>：通过阻抗异常爬升检测，提前阻断热失控隐患。
+          <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.6; margin:0;">
+            • <strong>消除二手交易信息差</strong>：掌握真实衰减斜率与健康拐点；<br>
+            • <strong>量化调理恢复成效</strong>：对比调理前后恢复量，提供科学残值依据；<br>
+            • <strong>预防性安全预警</strong>：监测阻抗异常爬升，防范热失控隐患。
           </p>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title" style="color:var(--color-green);"><span>🌐</span> 宏观尺度反哺：隐私计算驱动的“数据飞轮”自演进体系</div>
+        <div class="card" style="padding:10px 12px;">
+          <div class="card-header" style="margin-bottom:4px;">
+            <div class="card-title" style="color:var(--color-green); font-size:12px;"><span>🌐</span> 宏观尺度反哺：差分隐私数据飞轮</div>
           </div>
-          <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.7;">
-            • <strong>严格隐私安全合规</strong>：采用端侧局域差分隐私 (LDP) 与去标识化脱敏，剥离用户身份、车牌与地理轨迹；<br>
-            • <strong>攻克实验室样本分布偏差</strong>：将海量真实多频次脱敏物理特征聚合，反哺 M1 梯度提升树与 M2 弹性网络模型；<br>
-            • <strong>实现模型“越用越准”</strong>：构建从用户体检到模型自主进化的良性生态数据闭环。
+          <p style="font-size:11.5px; color:var(--text-secondary); line-height:1.6; margin:0;">
+            • <strong>差分隐私合规</strong>：本地差分隐私脱敏，剥离身份与轨迹信息；<br>
+            • <strong>克服样本分布偏差</strong>：汇聚多频次物理特征，反哺算法模型；<br>
+            • <strong>模型持续自演进</strong>：形成“应用-脱敏-进化”的良性数据闭环。
           </p>
         </div>
       </div>
