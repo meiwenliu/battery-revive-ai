@@ -108,7 +108,7 @@
     </button>
   </nav>
 
-  <!-- 4. 标准样例快捷栏与全体系支持提示 -->
+  <!-- 4. 标准样例快捷栏与全体系支持说明 -->
   <aside class="sample-bar">
     <div style="display:flex; align-items:center; gap:8px;">
       <span style="color:var(--color-green); font-weight:700;">★ 示例样本：</span>
@@ -192,12 +192,14 @@
             <div class="form-group" style="margin-bottom:8px;">
               <label class="form-label" style="font-size:11px; color:var(--text-secondary);">① 快速调取台架实测标定电芯：</label>
               <select class="form-select" id="selBenchmarkCell" onchange="loadBenchmarkCell(this.value)" style="font-size:11.5px; font-weight:600; border-color:var(--color-brand);">
+                <option value="" disabled>-- 快速调取台架实测标定电芯 --</option>
                 <option value="retire_lfp" selected>🔷 [实测#3] 磷酸铁锂 (LFP) 车载退役电芯 (SOH≈79%, 推荐调理)</option>
                 <option value="fresh_lfp">🟢 [实测#1] 磷酸铁锂 (LFP) 出厂全新电芯 (SOH≈98%, 储能优选)</option>
                 <option value="healthy_lfp">🔵 [实测#2] 磷酸铁锂 (LFP) 在役健康电芯 (SOH≈89%, 高敏备电)</option>
                 <option value="echelon_ncm">🟡 [实测#4] 三元高镍 (NCM) 梯次轻载电芯 (SOH≈69%, 建议轻载)</option>
                 <option value="dead_lfp">🔴 [实测#5] 磷酸铁锂 (LFP) 深度老化失效电芯 (SOH≈54%, 建议提锂)</option>
                 <option value="naion_proto">🟣 [实测#6] 钠离子电池 (Na-ion) 试验电芯 (SOH≈88%, 调理再生)</option>
+                <option value="sic_aging">🔶 [实测#7] 硅碳复合 (NCM-SiC) 衰退电芯 (SOH≈78%, 推荐调理)</option>
               </select>
             </div>
 

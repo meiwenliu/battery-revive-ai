@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('inputQDis').value = c.q_dis_ah;
         document.getElementById('inputNomCap').value = c.nom_cap_ah;
         
-        // 联动更新微观 8 项特征，使 M1 与 M2 精准反映该电芯
+        // 联动更新微观 8 项特征，使 M1 与 M2 精准表征该电芯
         const sohFrac = c.soh_pct / 100.0;
         document.getElementById('inputU0').value = +(3.265 + sohFrac * 0.058).toFixed(4);
         document.getElementById('inputRdcDis').value = +(0.0185 - sohFrac * 0.0075).toFixed(4);
@@ -255,13 +255,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
+
+      // 重置台架标定电芯下拉框，确保后续无论选哪只电芯都能稳定触发 onchange 事件
+      if (document.getElementById('selBenchmarkCell')) {
+        document.getElementById('selBenchmarkCell').value = '';
+      }
     }
 
-    // 状态徽标联动：明确显示待测
+    // 状态徽标联动：明确呈现当前状态
     const statusBadge = document.getElementById('chemStatusBadge');
     if (statusBadge) {
-      statusBadge.textContent = '待测状态 (未接入实测数据)';
-      statusBadge.style.color = 'var(--color-amber)';
+      if (updateInputs) {
+        statusBadge.textContent = '待测状态 (未接入实测数据)';
+        statusBadge.style.color = 'var(--color-amber)';
+      } else {
+        statusBadge.textContent = spec.statusText || '已完成台架标定';
+        statusBadge.style.color = spec.statusColor || 'var(--color-green)';
+      }
     }
 
     // 批量分选矩阵随体系自适应
@@ -351,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `).join('');
   }
 
-  // 科学呈现待测状态 (没有测量数据就诚实显示没有，杜绝PPT式假象)
+  // 科学呈现待测状态 (没有测量数据就如实呈现没有，杜绝假象)
   function renderUnmeasuredState(chemKey) {
     const spec = CalculationEngine.CHEMISTRY_SPECS[chemKey] || CalculationEngine.CHEMISTRY_SPECS.lfp;
 
@@ -483,8 +493,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chemKey === 'lfp') loadBenchmarkCell('retire_lfp');
     else if (chemKey === 'ncm') loadBenchmarkCell('echelon_ncm');
     else if (chemKey === 'naion') loadBenchmarkCell('naion_proto');
+    else if (chemKey === 'sic') loadBenchmarkCell('sic_aging');
     else {
-      alert('当前材料体系尚未在国家测试台架完成全周期标定，请通过【📂 导入测试仪 CSV】接入真实测量时序数据。');
+      loadBenchmarkCell('retire_lfp');
     }
   };
 
@@ -493,8 +504,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const b = CalculationEngine.CALIBRATED_BENCHMARKS[key];
     if (!b) return;
 
+    isMeasurementDataLoaded = true;
+
     if (document.getElementById('selBatteryChemistry')) {
       document.getElementById('selBatteryChemistry').value = b.chem;
+    }
+    if (document.getElementById('selBenchmarkCell')) {
+      document.getElementById('selBenchmarkCell').value = key;
     }
     handleChemistryChange(false); // 更新体系上下文与 100 只矩阵，但不覆盖特定样本的真实参数
 
@@ -590,6 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('provenanceConfidence').textContent = '特征工程解析成功 (置信度99.9%)';
         }
 
+        isMeasurementDataLoaded = true;
         runFullEvaluation();
         alert(`✅ 成功解析测试数据文件 [${file.name}]！\n已从实测时序数据中提取 8 项微观特征参数并驱动全流程诊断。`);
       } catch (err) {
@@ -623,6 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('provenanceConfidence').textContent = '实时动态追踪 (四端子开尔文采样)';
     }
 
+    isMeasurementDataLoaded = true;
     runFullEvaluation();
     alert('⚡ 已将示波器当前通道测量到的电压与脉冲内阻瞬态值成功同步至诊断中心！');
   };
@@ -883,9 +901,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 11. 样例快捷载入 (完全就地载入，绝不切页)
   window.loadPresetSample = function(type) {
+    isMeasurementDataLoaded = true;
     if (type === 'pulsebat') {
       document.getElementById('selBatteryChemistry').value = 'lfp';
-      handleChemistryChange(true);
+      handleChemistryChange(false);
+      if (document.getElementById('selBenchmarkCell')) document.getElementById('selBenchmarkCell').value = 'retire_lfp';
       document.getElementById('inputCellId').value = 'BAT-35Ah-01号';
       document.getElementById('inputNomCap').value = 35.0;
       document.getElementById('inputQDis').value = 27.65;
@@ -897,23 +917,30 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('inputAsym').value = -0.0521;
       document.getElementById('inputRelax').value = 0.0537;
       document.getElementById('inputSOC').value = 50.0;
+      runFullEvaluation();
     } else if (type === 'recovery62') {
       document.getElementById('selBatteryChemistry').value = 'lfp';
-      handleChemistryChange(true);
+      handleChemistryChange(false);
       document.getElementById('inputCellId').value = 'Cell-k2 (18650循环电芯)';
       document.getElementById('inputNomCap').value = 1.50;
       document.getElementById('inputQDis').value = 1.025;
+      document.getElementById('inputU0').value = 3.2500;
+      document.getElementById('inputRdcDis').value = 0.0165;
+      document.getElementById('inputRdcChg').value = 0.0178;
+      document.getElementById('inputDrdc').value = -0.0035;
+      document.getElementById('inputEta').value = -0.0350;
+      document.getElementById('inputAsym').value = -0.0650;
+      document.getElementById('inputRelax').value = 0.0580;
+      document.getElementById('inputSOC').value = 50.0;
       document.getElementById('inputCE').value = 0.9835;
       document.getElementById('inputEE').value = 0.8920;
-      document.getElementById('inputVMean').value = 3.192;
-      document.getElementById('inputVHyst').value = 0.1450;
+      if (document.getElementById('inputVMean')) document.getElementById('inputVMean').value = 3.192;
+      if (document.getElementById('inputVHyst')) document.getElementById('inputVHyst').value = 0.1450;
+      runFullEvaluation();
     } else if (type === 'echelon_batch') {
-      document.getElementById('selBatteryChemistry').value = 'lfp';
-      handleChemistryChange(true);
+      loadBenchmarkCell('retire_lfp');
       document.getElementById('inputCellId').value = 'BAT-2026-REC-058';
-      document.getElementById('inputBatchCount').value = 100;
     }
-    runFullEvaluation();
   };
 
   // 12. 初始渲染
@@ -952,10 +979,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2023-05-10',
             soh: 100.0,
             rdc: 9.8,
+            qrec: '0.00',
+            after_soh: '100.0',
             tier: 'A 级 (优选储能)',
+            tier_full: 'A 级：优质全新 · 优选储能',
             valuation_amount: '18,800 元 (原值新车标定)',
             residual_pct: '100.0%',
             inspector: '交付中心检测师 #01',
+            temp: '25.0℃',
             purpose: '新车交付出厂健康度公证',
             hash: 'dp_e3b0...9821'
           },
@@ -971,10 +1002,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2024-02-18',
             soh: 94.2,
             rdc: 10.9,
+            qrec: '0.45',
+            after_soh: '95.5',
             tier: 'A 级 (优选储能)',
+            tier_full: 'A 级：轻度损耗 · 在役健康',
             valuation_amount: '16,500 元 (在役健康)',
             residual_pct: '87.8%',
             inspector: '4S旗舰店技师 #05',
+            temp: '25.0℃',
             purpose: '常规首保健康度核查',
             hash: 'dp_a1b2...8812'
           },
@@ -990,10 +1025,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2024-12-05',
             soh: 88.5,
             rdc: 12.3,
+            qrec: '1.12',
+            after_soh: '91.7',
             tier: 'A 级 (高敏备电)',
+            tier_full: 'A 级：轻度极化 · 高敏备电',
             valuation_amount: '14,200 元 (在役良好)',
             residual_pct: '75.5%',
             inspector: '检测服务站工程师 #03',
+            temp: '25.0℃',
             purpose: '冬季电池低温极化体检',
             hash: 'dp_7c9f...5541'
           },
@@ -1009,10 +1048,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2025-08-30',
             soh: 76.8,
             rdc: 14.5,
+            qrec: '2.71',
+            after_soh: '84.5',
             tier: 'B 级 (调理再生)',
+            tier_full: 'B 级：深度调理再生 · 储能服役',
             valuation_amount: '11,300 元 (待调理残值)',
             residual_pct: '60.1%',
             inspector: '国家二手车评估师 #09',
+            temp: '25.0℃',
             purpose: '二手车交易残值公证',
             hash: 'dp_99a8...3321'
           },
@@ -1028,10 +1071,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2025-09-03',
             soh: 83.5,
             rdc: 11.8,
+            qrec: '0.35',
+            after_soh: '84.5',
             tier: 'A 级 (储能直接服役)',
+            tier_full: 'A 级：调理再生达标 · 储能直接服役',
             valuation_amount: '13,800 元 (再生增值+22%)',
             residual_pct: '73.4%',
             inspector: '高级电化学工程师 #08',
+            temp: '25.0℃',
             purpose: '微调理再生效果工程验收',
             hash: 'dp_f4e3...1109'
           }
@@ -1050,10 +1097,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2022-08-10',
             soh: 99.5,
             rdc: 12.2,
+            qrec: '0.00',
+            after_soh: '99.5',
             tier: 'A 级 (优选储能)',
+            tier_full: 'A 级：优质出厂 · 5G通信备电',
             valuation_amount: '15,600 元',
             residual_pct: '98.5%',
             inspector: '铁塔运维工程师 #02',
+            temp: '25.0℃',
             purpose: '5G基站备电投运验收',
             hash: 'dp_44a1...9011'
           },
@@ -1069,10 +1120,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2023-08-15',
             soh: 91.0,
             rdc: 13.8,
+            qrec: '0.62',
+            after_soh: '92.8',
             tier: 'A 级 (高敏备电)',
+            tier_full: 'A 级：在役良好 · 5G通信备电',
             valuation_amount: '13,200 元',
             residual_pct: '84.6%',
             inspector: '铁塔运维工程师 #02',
+            temp: '25.0℃',
             purpose: '夏季高温防断电巡检',
             hash: 'dp_88c7...4412'
           },
@@ -1088,10 +1143,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2024-08-20',
             soh: 82.5,
             rdc: 15.6,
+            qrec: '1.45',
+            after_soh: '86.6',
             tier: 'B 级 (调理再生)',
+            tier_full: 'B 级：深度调理再生 · 户用微电网',
             valuation_amount: '10,800 元',
             residual_pct: '69.2%',
             inspector: '通信装备检验员 #04',
+            temp: '25.0℃',
             purpose: '备电蓄电池役龄考核',
             hash: 'dp_33f4...7781'
           },
@@ -1107,10 +1166,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2025-08-25',
             soh: 88.0,
             rdc: 13.2,
+            qrec: '0.38',
+            after_soh: '89.1',
             tier: 'A 级 (基站继续服役)',
+            tier_full: 'A 级：调理再生达标 · 基站延保服役',
             valuation_amount: '12,600 元',
             residual_pct: '80.7%',
             inspector: '通信装备检验员 #04',
+            temp: '25.0℃',
             purpose: '轮换调理后延保评估',
             hash: 'dp_22b3...6690'
           }
@@ -1129,10 +1192,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2023-01-01',
             soh: 100.0,
             rdc: 8.5,
+            qrec: '0.00',
+            after_soh: '100.0',
             tier: 'A 级 (高价值储能)',
+            tier_full: 'A 级：电网新装标定 · 调频储能',
             valuation_amount: '22,000 元',
             residual_pct: '100.0%',
             inspector: '电网质检工程师 #01',
+            temp: '25.0℃',
             purpose: '储能电站初装入网公证',
             hash: 'dp_11e2...5566'
           },
@@ -1148,10 +1215,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2023-10-15',
             soh: 92.0,
             rdc: 9.9,
+            qrec: '0.78',
+            after_soh: '94.2',
             tier: 'A 级 (高价值储能)',
+            tier_full: 'A 级：高价值在役 · 调峰储能',
             valuation_amount: '19,500 元',
             residual_pct: '88.6%',
             inspector: '电网质检工程师 #01',
+            temp: '25.0℃',
             purpose: '高频双充双放周期定检',
             hash: 'dp_77b8...1122'
           },
@@ -1167,10 +1238,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2024-11-20',
             soh: 81.2,
             rdc: 12.4,
+            qrec: '2.15',
+            after_soh: '87.3',
             tier: 'B 级 (调理再生)',
+            tier_full: 'B 级：深度调理再生 · 工商业储能',
             valuation_amount: '15,600 元',
             residual_pct: '70.9%',
             inspector: '电网质检工程师 #02',
+            temp: '25.0℃',
             purpose: '电网安全运行考核',
             hash: 'dp_88a9...3344'
           },
@@ -1186,10 +1261,14 @@ document.addEventListener('DOMContentLoaded', () => {
             date: '2025-07-10',
             soh: 73.5,
             rdc: 14.8,
+            qrec: '1.20',
+            after_soh: '77.0',
             tier: 'C 级 (轻载利用)',
+            tier_full: 'C 级：低功率梯次 · 备用电源',
             valuation_amount: '9,800 元',
             residual_pct: '44.5%',
             inspector: '梯次利用评估师 #07',
+            temp: '25.0℃',
             purpose: '电网退役梯次分选转让',
             hash: 'dp_99b0...5566'
           }
@@ -1388,6 +1467,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const content = document.getElementById('certificateModalContent');
       if (!content) return;
 
+      const isNewCell = parseFloat(record.soh) >= 99.9;
+      const qrecDisplay = isNewCell
+        ? '<span style="color:var(--text-muted); font-size:12px;">0.00 Ah <strong style="color:var(--color-green);">(全新状态，无需调理)</strong></span>'
+        : `<strong style="color:var(--color-cyan); font-size:13.5px;">+${record.qrec || '2.71'} Ah</strong> <span style="font-size:11px; color:var(--text-secondary);">(预计可回升至 <strong style="color:var(--color-brand);">${record.after_soh || '85.2'}%</strong>)</span>`;
+      
+      const healthGradeDesc = isNewCell 
+        ? '出厂标定全新' 
+        : (record.soh >= 90 ? '一级优良健康' : (record.soh >= 80 ? '二级在役健康' : (record.soh >= 70 ? '三级梯次利用' : '临界退役建议再生')));
+
       const certHtml = `
         <div style="border:2px solid rgba(0, 229, 255, 0.4); border-radius:10px; padding:24px; background:linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%); position:relative; overflow:hidden;">
           <div style="position:absolute; right:20px; top:20px; width:100px; height:100px; border:3px dashed rgba(16, 185, 129, 0.4); border-radius:50%; display:flex; align-items:center; justify-content:center; transform:rotate(-15deg); pointer-events:none;">
@@ -1410,7 +1498,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div style="margin-bottom:16px;">
             <div style="font-size:12.5px; font-weight:800; color:var(--color-cyan); margin-bottom:8px;">一、送检委托与电池出厂档案</div>
-            <table class="report-meta-table">
+            <table class="cert-meta-table">
               <tr>
                 <td class="label">委托客户 / 单位：</td>
                 <td><strong>${record.client_name || '个人车主'}</strong></td>
@@ -1440,18 +1528,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div style="margin-bottom:16px;">
             <div style="font-size:12.5px; font-weight:800; color:var(--color-cyan); margin-bottom:8px;">二、电化学测试台架量化评估与诊断结果</div>
-            <table class="report-meta-table">
+            <table class="cert-meta-table">
               <tr>
                 <td class="label">当前实测健康度 (SOH)：</td>
-                <td><strong style="color:var(--color-green); font-size:15px;">${record.soh}%</strong> (二级健康)</td>
+                <td><strong style="color:var(--color-green); font-size:15px;">${record.soh}%</strong> (${healthGradeDesc})</td>
                 <td class="label">直流内阻 (R_dc)：</td>
-                <td><strong>${record.rdc} mΩ</strong> (未见恶性热失控极化)</td>
+                <td><strong style="color:var(--color-brand); font-size:13.5px;">${record.rdc} mΩ</strong> <span style="font-size:11px; color:var(--text-muted);">(未见恶性热失控极化)</span></td>
               </tr>
               <tr>
                 <td class="label">微调理可恢复潜力：</td>
-                <td><strong style="color:var(--color-cyan);">+${record.qrec || '2.71'} Ah</strong> (预计可回升至 <strong>${record.after_soh || '85.2'}%</strong>)</td>
+                <td>${qrecDisplay}</td>
                 <td class="label">测试台架与工程师：</td>
-                <td>${record.inspector || '华东检测中心 #08'} (恒温 ${record.temp || '25℃'})</td>
+                <td><span style="color:var(--text-primary); font-weight:600;">${record.inspector || '华东检测中心 #08'}</span> <span style="font-size:11px; color:var(--text-muted);">(恒温 ${record.temp || '25.0℃'})</span></td>
               </tr>
               <tr>
                 <td class="label">梯次利用分级决策：</td>
@@ -1511,18 +1599,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveToStorage() {
       try {
-        localStorage.setItem('battery_vault_records', JSON.stringify(this.currentRecords));
+        localStorage.setItem('battery_vault_records_v4', JSON.stringify(this.currentRecords));
       } catch (e) {}
     },
 
     loadFromStorage() {
       try {
-        const saved = localStorage.getItem('battery_vault_records');
+        const saved = localStorage.getItem('battery_vault_records_v4');
         if (saved) {
-          this.currentRecords = JSON.parse(saved);
-        } else {
-          this.loadPreset('ev_3yr');
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].qrec !== undefined) {
+            this.currentRecords = parsed;
+            return;
+          }
         }
+        this.loadPreset('ev_3yr');
       } catch (e) {
         this.loadPreset('ev_3yr');
       }

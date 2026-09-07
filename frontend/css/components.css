@@ -417,7 +417,34 @@
   color: #475569;
 }
 
-/* 点击跳转交互提示样式 */
+/* 商业质检公证书专属科技深色表格 (彻底消除深色弹窗下的白底方块与文字混淆) */
+.cert-meta-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cert-meta-table td {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #E2E8F0;
+  vertical-align: middle;
+}
+
+.cert-meta-table td.label {
+  background: rgba(0, 229, 255, 0.05);
+  font-weight: 600;
+  width: 25%;
+  color: #94A3B8;
+  font-family: var(--font-sans);
+}
+
+/* 点击跳转交互动效样式 */
 .clickable-card {
   cursor: pointer !important;
   position: relative;
@@ -616,8 +643,30 @@
 }
 
 /* ==========================================================================
-   商业级电池健康资产档案录入弹窗与质检评估单
+   商业级电池健康资产档案录入弹窗与质检公证书专属样式
    ========================================================================== */
+.cert-meta-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 14px;
+}
+
+.cert-meta-table td {
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #F8FAFC !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+}
+
+.cert-meta-table td.cert-label {
+  background: rgba(30, 41, 59, 0.90) !important;
+  color: #94A3B8 !important;
+  font-weight: 700;
+  width: 25%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 .modal-backdrop {
   position: fixed;
   top: 0;

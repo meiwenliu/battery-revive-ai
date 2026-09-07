@@ -2,7 +2,7 @@
  * 焕芯·电愈智策 前端纯 JS 高性能计算内核（支持用户自主选择算法模型）
  */
 const CalculationEngine = {
-  // M1 SOH 多模型配置字典 (只标注[推荐]，不显示具体MAE)
+  // M1 SOH 多模型配置字典 (只标注[推荐]，不直接呈现具体MAE)
   M1_MODELS: {
     xgboost: {
       name: "统一梯度提升决策树 (XGBoost) [推荐]",
@@ -54,7 +54,7 @@ const CalculationEngine = {
     }
   },
 
-  // M2 容量恢复多模型配置字典 (只标注[推荐]，不显示具体MAE)
+  // M2 容量恢复多模型配置字典 (只标注[推荐]，不直接呈现具体MAE)
   M2_MODELS: {
     elasticnet: {
       name: "弹性网络回归 (ElasticNet) [推荐]",
@@ -397,6 +397,29 @@ const CalculationEngine = {
       ce: 0.9780,
       ee: 0.8750,
       ef_mfg: 72.0
+    },
+    sic_aging: {
+      id: "SiC-60Ah-硅碳退役",
+      name: "🔶 [实测#7] 硅碳复合 (NCM-SiC) 循环衰退电芯 (1200次循环, SOH≈78%, 推荐调理)",
+      source_desc: "高能量密度硅碳软包电芯长循环台架脉冲数据 (1200次循环)",
+      badge_text: "硅碳退役调理",
+      chem: "sic",
+      nom_cap: 60.0,
+      v_nom: 3.70,
+      v_chg_cut: 4.25,
+      v_dis_cut: 2.50,
+      q_dis: 46.80,
+      u0: 3.7650,
+      rdc_dis: 0.0125,
+      rdc_chg: 0.0142,
+      drdc: -0.0042,
+      eta: -0.0480,
+      asym: -0.0760,
+      relax: 0.0680,
+      soc: 50.0,
+      ce: 0.9750,
+      ee: 0.8820,
+      ef_mfg: 142.0
     }
   },
 
