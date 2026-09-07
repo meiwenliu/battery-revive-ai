@@ -662,21 +662,87 @@ const ChartManager = {
     return this.initChart(domId, opt);
   },
 
-  // 6. 批量分级分选环形图
+  // 6. 批量分级分选环形图 (再利用等级分布占比)
   renderBatchDonut(domId, stats = null) {
     const t = this.getThemeOptions();
-    const counts = stats || { classA: 38, classB: 41, classC: 15, classD: 6 };
+    let counts = stats;
+    if (!counts && typeof window !== 'undefined' && window.batch100 && Array.isArray(window.batch100) && window.batch100.length > 0) {
+      counts = { classA: 0, classB: 0, classC: 0, classD: 0 };
+      window.batch100.forEach(c => {
+        if (c.tier_code === 'CLASS_A') counts.classA++;
+        else if (c.tier_code === 'CLASS_B') counts.classB++;
+        else if (c.tier_code === 'CLASS_C') counts.classC++;
+        else if (c.tier_code === 'CLASS_D') counts.classD++;
+      });
+    }
+    if (!counts) {
+      counts = { classA: 35, classB: 42, classC: 17, classD: 6 };
+    }
+    const total = (counts.classA + counts.classB + counts.classC + counts.classD) || 100;
+
     const opt = {
       backgroundColor: 'transparent',
-      tooltip: { trigger: 'item', formatter: '{b}: {c} 只 ({d}%)' },
-      legend: { bottom: '0%', left: 'center', textStyle: { color: t.textColor, fontSize: 10.5 } },
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(15, 23, 42, 0.92)',
+        borderColor: 'rgba(0, 229, 255, 0.3)',
+        borderWidth: 1,
+        textStyle: { color: '#FFFFFF', fontSize: 12 },
+        formatter: function (params) {
+          return `<div style="font-weight:bold; color:var(--color-brand); margin-bottom:2px;">${params.name}</div>
+                  <div>样本数量：<strong>${params.value} 只</strong></div>
+                  <div>占总体比例：<strong style="color:#00E5FF;">${params.percent}%</strong></div>`;
+        }
+      },
+      legend: {
+        bottom: 2,
+        left: 'center',
+        itemWidth: 10,
+        itemHeight: 10,
+        itemGap: 10,
+        textStyle: { color: t.textColor, fontSize: 10.5 }
+      },
+      title: {
+        text: `${total}只`,
+        subtext: '评定总样本',
+        left: 'center',
+        top: '38%',
+        textStyle: {
+          color: t.textColor,
+          fontSize: 19,
+          fontWeight: 'bold'
+        },
+        subtextStyle: {
+          color: t.subTextColor,
+          fontSize: 10.5
+        }
+      },
       series: [{
-        name: '分级分选评级',
+        name: '再利用等级评定',
         type: 'pie',
         radius: ['45%', '70%'],
-        avoidLabelOverlap: false,
-        itemStyle: { borderRadius: 5, borderColor: 'transparent', borderWidth: 1 },
-        label: { show: true, position: 'inside', formatter: '{c}只', color: '#FFFFFF', fontWeight: 'bold' },
+        center: ['50%', '45%'],
+        avoidLabelOverlap: true,
+        itemStyle: {
+          borderRadius: 5,
+          borderColor: t.splitLineColor || 'rgba(255,255,255,0.05)',
+          borderWidth: 1.5
+        },
+        label: {
+          show: true,
+          position: 'outside',
+          formatter: '{b|{b}}\n{d|{d}%}',
+          rich: {
+            b: { fontSize: 10, color: t.subTextColor },
+            d: { fontSize: 11, fontWeight: 'bold', color: t.textColor }
+          }
+        },
+        labelLine: {
+          show: true,
+          length: 8,
+          length2: 6,
+          lineStyle: { color: t.subTextColor }
+        },
         data: [
           { value: counts.classA, name: 'A级(储能服役)', itemStyle: { color: '#10B981' } },
           { value: counts.classB, name: 'B级(调理再生)', itemStyle: { color: '#06B6D4' } },
@@ -685,6 +751,7 @@ const ChartManager = {
         ]
       }]
     };
+    return this.initChart(domId, opt);
   },
 
   // 7. 电池终身多节点健康衰减与容量恢复时序轨迹图

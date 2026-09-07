@@ -39,7 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (targetPane) {
         targetPane.classList.add('active');
       }
-      setTimeout(() => ChartManager.resizeAll(), 50);
+      setTimeout(() => {
+        ChartManager.resizeAll();
+        if (targetId === 'tab-m2') {
+          ChartManager.renderBatchDonut('batchDonutChart');
+          if (ChartManager.charts['m2ConformalChart']) {
+            ChartManager.charts['m2ConformalChart'].resize();
+          }
+        }
+      }, 50);
     });
   });
 
