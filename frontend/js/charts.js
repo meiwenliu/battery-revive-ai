@@ -17,7 +17,11 @@ const ChartManager = {
     }
     this.renderM1FeatureImportance('m1FeatureChart', chemKey);
     this.renderM1ModelCompare('m1ModelCompareChart', document.getElementById('selM1Model')?.value || 'xgboost');
-    this.renderM2Conformal('m2ConformalChart', nomCap);
+    const activeCell = (typeof window !== 'undefined' && window.batch100 && Array.isArray(window.batch100))
+      ? (window.batch100.find(c => c.id === window.activeCellId) || window.batch100[0])
+      : null;
+    const cohort = (typeof window !== 'undefined' && window.batch100 && Array.isArray(window.batch100)) ? window.batch100 : null;
+    this.renderM2Conformal('m2ConformalChart', nomCap, activeCell, cohort);
     this.renderEchelonRadar('echelonRadarChart');
     this.renderCarbonWaterfall('carbonWaterfallChart');
     this.renderBatchDonut('batchDonutChart');
@@ -329,51 +333,247 @@ const ChartManager = {
     return this.initChart(domId, opt);
   },
 
-  // 3. M2 逐电芯恢复容量预测值与 90% 保角预测区间 (随当前电芯标称容量与体系自适应缩放)
-  renderM2Conformal(domId, nomCap = 35.0) {
+  // 3. M2 逐电芯容量恢复预测与 90% 保角置信区间 (柱状区间图，突出选定电芯，杜绝连续曲线)
+  renderM2Conformal(domId, nomCap = 35.0, activeCell = null, cellCohort = null) {
     const t = this.getThemeOptions();
-    const cellNames = ['72', 'Cella', 'CellG', 'CellJ', 'CellT', 'Cellf', 'Cellg2', 'Cellh2', 'Cellj2', 'Cellk2', 'Celll2', 'Cellm', 'Cello', 'Cellp2', 'Cellq2', 'Cellr2', 'Cells2', 'Cellu2', 'Cell15', 'Cell16', 'CellC11', 'CellC14'];
-    const scaleFactor = Math.max(0.1, (nomCap || 35.0) / 1.50 * 0.043);
-    const baseTrue = [0.06, 0.09, 0.10, 0.10, 0.10, 0.14, 0.13, 0.17, 0.16, 0.17, 0.24, 0.18, 0.14, 0.21, 0.32, 0.12, 0.17, 0.10, 0.25, 0.15, 0.10, 0.34];
-    const basePred = [0.061, 0.126, 0.102, 0.096, 0.130, 0.148, 0.107, 0.129, 0.139, 0.193, 0.220, 0.142, 0.152, 0.160, 0.290, 0.153, 0.160, 0.157, 0.204, 0.213, 0.068, 0.450];
     
-    const trueVals = baseTrue.map(v => +(v * scaleFactor).toFixed(4));
-    const predVals = basePred.map(v => +(v * scaleFactor).toFixed(4));
+    // 构造电芯数据序列
+    let cellList = [];
+    
+    if (cellCohort && Array.isArray(cellCohort) && cellCohort.length > 0) {
+      cellList = cellCohort.map(c => ({
+        id: c.id,
+        shortName: c.id.replace(/^.*REC-/, '#'),
+        soh: c.soh_pct,
+        pred_q: c.q_rec_ah,
+        lower: c.lower_90_ah !== undefined ? c.lower_90_ah : +(c.q_rec_ah * 0.85).toFixed(4),
+        upper: c.upper_90_ah !== undefined ? c.upper_90_ah : +(c.q_rec_ah * 1.15).toFixed(4),
+        true_q: null
+      }));
+    } else {
+      // 22 只 18650 循环恢复实测验证样本库
+      const base18650 = [
+        { id: 'Cell-72', soh: 64.5, true_q: 0.06, pred_q: 0.061, lower: 0.003, upper: 0.119 },
+        { id: 'Cell-a', soh: 64.5, true_q: 0.09, pred_q: 0.126, lower: 0.068, upper: 0.185 },
+        { id: 'Cell-G', soh: 66.4, true_q: 0.10, pred_q: 0.102, lower: 0.044, upper: 0.160 },
+        { id: 'Cell-J', soh: 68.2, true_q: 0.10, pred_q: 0.096, lower: 0.038, upper: 0.154 },
+        { id: 'Cell-T', soh: 67.9, true_q: 0.10, pred_q: 0.130, lower: 0.071, upper: 0.188 },
+        { id: 'Cell-f', soh: 66.3, true_q: 0.14, pred_q: 0.148, lower: 0.090, upper: 0.206 },
+        { id: 'Cell-g2', soh: 59.1, true_q: 0.13, pred_q: 0.107, lower: 0.049, upper: 0.166 },
+        { id: 'Cell-h2', soh: 66.1, true_q: 0.17, pred_q: 0.129, lower: 0.071, upper: 0.187 },
+        { id: 'Cell-j2', soh: 62.9, true_q: 0.16, pred_q: 0.139, lower: 0.081, upper: 0.198 },
+        { id: 'Cell-k2', soh: 55.1, true_q: 0.17, pred_q: 0.193, lower: 0.135, upper: 0.251 },
+        { id: 'Cell-l2', soh: 48.6, true_q: 0.24, pred_q: 0.220, lower: 0.162, upper: 0.278 },
+        { id: 'Cell-m', soh: 63.4, true_q: 0.18, pred_q: 0.142, lower: 0.084, upper: 0.200 },
+        { id: 'Cell-o', soh: 54.2, true_q: 0.14, pred_q: 0.152, lower: 0.094, upper: 0.210 },
+        { id: 'Cell-p2', soh: 56.9, true_q: 0.21, pred_q: 0.160, lower: 0.102, upper: 0.218 },
+        { id: 'Cell-q2', soh: 31.5, true_q: 0.32, pred_q: 0.290, lower: 0.232, upper: 0.348 },
+        { id: 'Cell-r2', soh: 54.3, true_q: 0.12, pred_q: 0.153, lower: 0.095, upper: 0.211 },
+        { id: 'Cell-s2', soh: 54.7, true_q: 0.17, pred_q: 0.160, lower: 0.102, upper: 0.218 },
+        { id: 'Cell-u2', soh: 57.4, true_q: 0.10, pred_q: 0.157, lower: 0.099, upper: 0.215 },
+        { id: 'Cell-15', soh: 59.0, true_q: 0.25, pred_q: 0.204, lower: 0.146, upper: 0.262 },
+        { id: 'Cell-16', soh: 75.5, true_q: 0.15, pred_q: 0.213, lower: 0.154, upper: 0.271 },
+        { id: 'Cell-C11', soh: 66.3, true_q: 0.10, pred_q: 0.068, lower: 0.009, upper: 0.126 },
+        { id: 'Cell-C14', soh: 14.6, true_q: 0.34, pred_q: 0.450, lower: 0.392, upper: 0.508 }
+      ];
+      const scale = (nomCap && nomCap > 1.50) ? (nomCap / 35.0 * 0.95) : 1.0;
+      cellList = base18650.map(c => ({
+        id: c.id,
+        shortName: c.id,
+        soh: c.soh,
+        pred_q: +(c.pred_q * scale).toFixed(4),
+        lower: +(c.lower * scale).toFixed(4),
+        upper: +(c.upper * scale).toFixed(4),
+        true_q: +(c.true_q * scale).toFixed(4)
+      }));
+    }
+
+    // 匹配当前选定电芯索引
+    let activeIdx = -1;
+    let targetCellId = '';
+    if (activeCell) {
+      targetCellId = typeof activeCell === 'string' ? activeCell : (activeCell.id || '');
+      activeIdx = cellList.findIndex(c => c.id === targetCellId || (activeCell.index && c.id.endsWith(activeCell.index.toString().padStart(3, '0'))));
+    }
+    if (activeIdx === -1) {
+      activeIdx = 0;
+    }
+
+    const categories = cellList.map(c => c.shortName || c.id);
+    const predData = cellList.map((c, idx) => {
+      const isActive = (idx === activeIdx);
+      return {
+        value: c.pred_q,
+        itemStyle: {
+          color: isActive ? '#00E5FF' : 'rgba(2, 132, 199, 0.45)',
+          borderColor: isActive ? '#FFFFFF' : 'rgba(0, 229, 255, 0.3)',
+          borderWidth: isActive ? 2 : 1,
+          shadowBlur: isActive ? 12 : 0,
+          shadowColor: 'rgba(0, 229, 255, 0.8)'
+        }
+      };
+    });
+
+    const errorBarData = cellList.map((c, idx) => [idx, c.lower, c.upper]);
+    const hasTrueData = cellList.some(c => c.true_q !== null);
+    const trueScatterData = hasTrueData ? cellList.map(c => c.true_q) : [];
+
+    const windowSize = 25;
+    let zoomStart = 0;
+    let zoomEnd = Math.min(100, Math.round((windowSize / cellList.length) * 100));
+    if (cellList.length > windowSize && activeIdx !== -1) {
+      const startIdx = Math.max(0, Math.min(cellList.length - windowSize, activeIdx - Math.floor(windowSize / 2)));
+      zoomStart = Math.round((startIdx / cellList.length) * 100);
+      zoomEnd = Math.round(((startIdx + windowSize) / cellList.length) * 100);
+    }
+
+    const series = [
+      {
+        name: '模型预估恢复量',
+        type: 'bar',
+        barWidth: cellList.length > 30 ? '55%' : '40%',
+        data: predData,
+        markPoint: activeIdx !== -1 ? {
+          symbol: 'pin',
+          symbolSize: 44,
+          data: [{
+            name: '当前聚焦电芯',
+            coord: [activeIdx, cellList[activeIdx].pred_q],
+            value: `选中\n+${cellList[activeIdx].pred_q}`,
+            itemStyle: { color: '#F59E0B' },
+            label: { color: '#FFFFFF', fontSize: 9.5, fontWeight: 'bold' }
+          }]
+        } : undefined
+      },
+      {
+        name: '90%保角置信区间',
+        type: 'custom',
+        renderItem: function (params, api) {
+          const xVal = api.value(0);
+          const lowVal = api.value(1);
+          const highVal = api.value(2);
+          const halfWidth = 4.5;
+
+          const lowPoint = api.coord([xVal, lowVal]);
+          const highPoint = api.coord([xVal, highVal]);
+          const isActive = (params.dataIndex === activeIdx);
+          const strokeColor = isActive ? '#F59E0B' : (t.textColor || '#94A3B8');
+          const lineWidth = isActive ? 2.5 : 1.2;
+
+          return {
+            type: 'group',
+            children: [
+              {
+                type: 'line',
+                shape: { x1: lowPoint[0], y1: lowPoint[1], x2: highPoint[0], y2: highPoint[1] },
+                style: { stroke: strokeColor, lineWidth: lineWidth }
+              },
+              {
+                type: 'line',
+                shape: { x1: highPoint[0] - halfWidth, y1: highPoint[1], x2: highPoint[0] + halfWidth, y2: highPoint[1] },
+                style: { stroke: strokeColor, lineWidth: lineWidth }
+              },
+              {
+                type: 'line',
+                shape: { x1: lowPoint[0] - halfWidth, y1: lowPoint[1], x2: lowPoint[0] + halfWidth, y2: lowPoint[1] },
+                style: { stroke: strokeColor, lineWidth: lineWidth }
+              }
+            ]
+          };
+        },
+        data: errorBarData,
+        z: 10
+      }
+    ];
+
+    if (hasTrueData) {
+      series.push({
+        name: '实测基准恢复量',
+        type: 'scatter',
+        symbol: 'circle',
+        symbolSize: 8,
+        data: trueScatterData,
+        itemStyle: { color: '#10B981' },
+        z: 12
+      });
+    }
 
     const opt = {
       backgroundColor: 'transparent',
-      tooltip: { trigger: 'axis' },
-      legend: { data: ['实测恢复量', '模型预估量'], textStyle: { color: t.textColor }, top: 0 },
-      grid: { top: 35, right: 15, bottom: 35, left: 55 },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: function (params) {
+          const idx = params[0].dataIndex;
+          const item = cellList[idx];
+          const isCurr = (idx === activeIdx);
+          let html = `<div style="font-weight:700; color:var(--color-brand); margin-bottom:4px;">${item.id} ${isCurr ? '<span style="color:#F59E0B;">(当前聚焦)</span>' : ''}</div>`;
+          if (item.soh !== undefined) html += `<div style="font-size:11.5px;">SOH 健康度：<strong>${item.soh}%</strong></div>`;
+          html += `<div style="font-size:11.5px;">预估恢复量：<strong style="color:#00E5FF;">+${item.pred_q} Ah</strong></div>`;
+          html += `<div style="font-size:11.5px;">90%保角区间：<strong style="color:#F59E0B;">[${item.lower} ~ ${item.upper} Ah]</strong></div>`;
+          if (item.true_q !== null && item.true_q !== undefined) {
+            html += `<div style="font-size:11.5px;">台架实测真值：<strong style="color:#10B981;">+${item.true_q} Ah</strong></div>`;
+          }
+          return html;
+        }
+      },
+      legend: {
+        data: hasTrueData ? ['模型预估恢复量', '90%保角置信区间', '实测基准恢复量'] : ['模型预估恢复量', '90%保角置信区间'],
+        textStyle: { color: t.textColor, fontSize: 11 },
+        top: 0
+      },
+      grid: { top: 35, right: 20, bottom: cellList.length > 25 ? 50 : 35, left: 55 },
       xAxis: {
         type: 'category',
-        data: cellNames,
-        axisLabel: { color: t.subTextColor, fontSize: 9.5, rotate: 30 }
+        data: categories,
+        axisLabel: {
+          color: function (val, idx) {
+            return idx === activeIdx ? '#00E5FF' : t.subTextColor;
+          },
+          fontWeight: function (val, idx) {
+            return idx === activeIdx ? 'bold' : 'normal';
+          },
+          fontSize: 9.5,
+          interval: 0,
+          rotate: cellList.length > 15 ? 30 : 0
+        },
+        axisTick: { alignWithLabel: true }
       },
       yAxis: {
         type: 'value',
-        name: 'Q_rec (Ah)',
+        name: '可恢复容量 (Ah)',
+        nameTextStyle: { color: t.subTextColor, fontSize: 11 },
         splitLine: { lineStyle: { color: t.splitLineColor } }
       },
-      series: [
+      dataZoom: cellList.length > 25 ? [
+        { type: 'inside', start: zoomStart, end: zoomEnd },
         {
-          name: '实测恢复量',
-          type: 'scatter',
-          symbolSize: 8,
-          data: trueVals,
-          itemStyle: { color: '#10B981' }
-        },
-        {
-          name: '模型预估量',
-          type: 'line',
-          data: predVals,
-          smooth: true,
-          lineStyle: { color: '#00E5FF', width: 2 },
-          itemStyle: { color: '#00E5FF' }
+          type: 'slider',
+          height: 14,
+          bottom: 4,
+          start: zoomStart,
+          end: zoomEnd,
+          borderColor: 'transparent',
+          backgroundColor: 'rgba(255,255,255,0.04)',
+          fillerColor: 'rgba(0, 229, 255, 0.2)',
+          handleStyle: { color: '#00E5FF' }
         }
-      ]
+      ] : undefined,
+      series: series
     };
-    return this.initChart(domId, opt);
+
+    const chart = this.initChart(domId, opt);
+
+    if (chart && !chart._hasM2ClickListener) {
+      chart._hasM2ClickListener = true;
+      chart.on('click', function (params) {
+        if (typeof window.selectCellByIndex === 'function') {
+          window.selectCellByIndex(params.dataIndex);
+        }
+      });
+    }
+
+    return chart;
   },
 
   // 4. 四级分选五维度机理雷达图

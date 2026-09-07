@@ -94,57 +94,96 @@ document.addEventListener('DOMContentLoaded', () => {
   // 8. 生成 100 只电芯矩阵与批量数据
   let batch100 = CalculationEngine.generateBatch100Cells();
   let currentFilter = 'ALL';
-  let activeCellId = 'BAT-2026-REC-001';
+  let activeCellId = (batch100 && batch100[0]) ? batch100[0].id : 'BAT-2026-REC-001';
+  window.batch100 = batch100;
+  window.activeCellId = activeCellId;
+
+  // 全局统一电芯点选与跨模块高亮联动调度器
+  window.selectCellByIndex = function(idx) {
+    if (!batch100 || !batch100.length) return;
+    const index = Math.max(0, Math.min(batch100.length - 1, idx));
+    const c = batch100[index];
+    if (!c) return;
+
+    activeCellId = c.id;
+    window.activeCellId = activeCellId;
+
+    // 1. 高亮 100 只电芯矩阵芯片
+    document.querySelectorAll('.cell-chip').forEach((el, i) => {
+      if (i === index) {
+        el.classList.add('active-cell');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      } else {
+        el.classList.remove('active-cell');
+      }
+    });
+
+    // 2. 高亮 100 只电芯表格行
+    document.querySelectorAll('#batchTableBody tr').forEach(tr => {
+      if (tr.firstElementChild && tr.firstElementChild.textContent.trim() === c.id) {
+        tr.style.background = 'rgba(0, 229, 255, 0.15)';
+      } else {
+        tr.style.background = '';
+      }
+    });
+
+    // 3. 设置当前工作区电芯参数与微观 8 项特征
+    if (document.getElementById('inputCellId')) document.getElementById('inputCellId').value = c.id;
+    if (document.getElementById('inputQDis')) document.getElementById('inputQDis').value = c.q_dis_ah;
+    if (document.getElementById('inputNomCap')) document.getElementById('inputNomCap').value = c.nom_cap_ah;
+    
+    const sohFrac = c.soh_pct / 100.0;
+    if (document.getElementById('inputU0')) document.getElementById('inputU0').value = +(3.265 + sohFrac * 0.058).toFixed(4);
+    if (document.getElementById('inputRdcDis')) document.getElementById('inputRdcDis').value = +(0.0185 - sohFrac * 0.0075).toFixed(4);
+    if (document.getElementById('inputRdcChg')) document.getElementById('inputRdcChg').value = +(0.0195 - sohFrac * 0.0070).toFixed(4);
+    if (document.getElementById('inputDrdc')) document.getElementById('inputDrdc').value = +(-0.0040 + sohFrac * 0.0018).toFixed(4);
+    if (document.getElementById('inputEta')) document.getElementById('inputEta').value = +(-0.040 + sohFrac * 0.016).toFixed(4);
+    if (document.getElementById('inputAsym')) document.getElementById('inputAsym').value = +(-0.080 + sohFrac * 0.035).toFixed(4);
+    if (document.getElementById('inputRelax')) document.getElementById('inputRelax').value = +(0.070 - sohFrac * 0.020).toFixed(4);
+
+    // 4. 同步刷新 Tab 4 顶部聚焦信息横幅
+    if (document.getElementById('m2FocusCellId')) {
+      document.getElementById('m2FocusCellId').textContent = c.id;
+      document.getElementById('m2FocusSoh').textContent = `(SOH: ${c.soh_pct}%)`;
+      document.getElementById('m2FocusQrec').textContent = `+${c.q_rec_ah} Ah`;
+      const lowBound = c.lower_90_ah !== undefined ? c.lower_90_ah : +(c.q_rec_ah * 0.75).toFixed(4);
+      const upBound = c.upper_90_ah !== undefined ? c.upper_90_ah : +(c.q_rec_ah * 1.25).toFixed(4);
+      document.getElementById('m2FocusBound').textContent = `[${lowBound} ~ ${upBound} Ah]`;
+      document.getElementById('m2FocusRpi').textContent = `${c.rpi_pct}%`;
+    }
+
+    // 5. 立即就地运算并驱动各表盘及图表联动
+    runFullEvaluation();
+
+    // 给 SOH 仪表盘卡片一个微光发光提醒，指示已成功就地更新
+    const gaugeBox = document.getElementById('sohGaugeChart');
+    if (gaugeBox && gaugeBox.parentElement) {
+      gaugeBox.parentElement.style.transition = 'box-shadow 0.3s ease';
+      gaugeBox.parentElement.style.boxShadow = '0 0 20px var(--color-brand)';
+      setTimeout(() => {
+        gaugeBox.parentElement.style.boxShadow = '';
+      }, 600);
+    }
+  };
 
   function renderPackMatrix() {
     const grid = document.getElementById('packCellsGrid');
     if (!grid) return;
     grid.innerHTML = '';
-    batch100.forEach(c => {
+    batch100.forEach((c, idx) => {
       const chip = document.createElement('div');
       chip.className = `cell-chip ${c.tier_code.toLowerCase().replace('_', '-')}`;
       if (c.id === activeCellId) {
         chip.classList.add('active-cell');
       }
       chip.textContent = c.index;
-      chip.title = `${c.id} | SOH: ${c.soh_pct}% | 评级: ${c.tier_title} | 恢复量: ${c.q_rec_ah}Ah (点击立即就地分析)`;
+      chip.title = `${c.id} | SOH: ${c.soh_pct}% | 评级: ${c.tier_title} | 恢复量: ${c.q_rec_ah}Ah (点击联动聚焦)`;
       
-      // 点击任意电芯：100% 保持在当前工作台，绝对不跳页！
+      // 点击任意电芯：100% 保持在当前工作台，绝对不跳页，全系统精准联动！
       chip.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
-        activeCellId = c.id;
-        document.querySelectorAll('.cell-chip').forEach(el => el.classList.remove('active-cell'));
-        chip.classList.add('active-cell');
-
-        // 设置当前电芯参数
-        document.getElementById('inputCellId').value = c.id;
-        document.getElementById('inputQDis').value = c.q_dis_ah;
-        document.getElementById('inputNomCap').value = c.nom_cap_ah;
-        
-        // 联动更新微观 8 项特征，使 M1 与 M2 精准表征该电芯
-        const sohFrac = c.soh_pct / 100.0;
-        document.getElementById('inputU0').value = +(3.265 + sohFrac * 0.058).toFixed(4);
-        document.getElementById('inputRdcDis').value = +(0.0185 - sohFrac * 0.0075).toFixed(4);
-        document.getElementById('inputRdcChg').value = +(0.0195 - sohFrac * 0.0070).toFixed(4);
-        document.getElementById('inputDrdc').value = +(-0.0040 + sohFrac * 0.0018).toFixed(4);
-        document.getElementById('inputEta').value = +(-0.040 + sohFrac * 0.016).toFixed(4);
-        document.getElementById('inputAsym').value = +(-0.080 + sohFrac * 0.035).toFixed(4);
-        document.getElementById('inputRelax').value = +(0.070 - sohFrac * 0.020).toFixed(4);
-
-        // 立即就地运算并驱动表盘
-        runFullEvaluation();
-
-        // 给 SOH 仪表盘卡片一个微光发光提醒，指示已成功就地更新
-        const gaugeBox = document.getElementById('sohGaugeChart');
-        if (gaugeBox && gaugeBox.parentElement) {
-          gaugeBox.parentElement.style.transition = 'box-shadow 0.3s ease';
-          gaugeBox.parentElement.style.boxShadow = '0 0 20px var(--color-brand)';
-          setTimeout(() => {
-            gaugeBox.parentElement.style.boxShadow = '';
-          }, 600);
-        }
+        window.selectCellByIndex(idx);
       });
       grid.appendChild(chip);
     });
@@ -161,6 +200,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filtered.slice(0, 50).forEach(c => {
       const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      if (c.id === activeCellId) {
+        tr.style.background = 'rgba(0, 229, 255, 0.15)';
+      }
       tr.innerHTML = `
         <td><strong>${c.id}</strong></td>
         <td><span style="color:var(--color-brand); font-weight:bold;">${c.soh_pct}%</span></td>
@@ -170,6 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <td><span style="color:${c.color}; font-weight:bold;">${c.tier_full}</span></td>
         <td>${c.ghg_net_kg} kg</td>
       `;
+      tr.addEventListener('click', () => {
+        const fullIdx = batch100.findIndex(x => x.id === c.id);
+        if (fullIdx !== -1) {
+          window.selectCellByIndex(fullIdx);
+        }
+      });
       tbody.appendChild(tr);
     });
   }
@@ -249,6 +298,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const curNomCap = parseFloat(document.getElementById('inputNomCap')?.value) || spec.nominal_cap_ah;
     const curVNom = parseFloat(document.getElementById('inputVNom')?.value) || spec.v_nominal;
     batch100 = CalculationEngine.generateBatch100Cells('xgboost', 'elasticnet', chemKey, curNomCap, curVNom);
+    window.batch100 = batch100;
+    if (!batch100.some(c => c.id === activeCellId)) {
+      activeCellId = (batch100 && batch100[0]) ? batch100[0].id : '';
+      window.activeCellId = activeCellId;
+    }
     renderPackMatrix();
     renderBatchTable();
     updateBatchCounts();
@@ -456,7 +510,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const chemKey = document.getElementById('selBatteryChemistry')?.value || 'lfp';
     if (chemKey === 'lfp') loadBenchmarkCell('retire_lfp');
     else if (chemKey === 'ncm') loadBenchmarkCell('echelon_ncm');
-    else if (chemKey === 'naion') loadBenchmarkCell('naion_proto');
     else if (chemKey === 'sic') loadBenchmarkCell('sic_aging');
     else {
       loadBenchmarkCell('retire_lfp');
@@ -721,8 +774,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // 联动刷新 Tab 3 专属物理特征重要性得分排序 (展现该体系独有机理)
     ChartManager.renderM1FeatureImportance('m1FeatureChart', chemKey);
 
-    // 联动刷新 Tab 4 动态保角预测区间图 (随标称容量真实缩放)
-    ChartManager.renderM2Conformal('m2ConformalChart', nom_cap);
+    // 联动刷新 Tab 4 逐电芯容量恢复预测与 90% 保角置信区间 (柱状区间图，突出聚焦选定电芯)
+    const activeCell = (batch100 && batch100.length > 0)
+      ? (batch100.find(c => c.id === activeCellId) || batch100[0])
+      : null;
+
+    if (activeCell && document.getElementById('m2FocusCellId')) {
+      document.getElementById('m2FocusCellId').textContent = activeCell.id;
+      document.getElementById('m2FocusSoh').textContent = `(SOH: ${activeCell.soh_pct}%)`;
+      document.getElementById('m2FocusQrec').textContent = `+${activeCell.q_rec_ah} Ah`;
+      const lowB = activeCell.lower_90_ah !== undefined ? activeCell.lower_90_ah : +(activeCell.q_rec_ah * 0.75).toFixed(4);
+      const upB = activeCell.upper_90_ah !== undefined ? activeCell.upper_90_ah : +(activeCell.q_rec_ah * 1.25).toFixed(4);
+      document.getElementById('m2FocusBound').textContent = `[${lowB} ~ ${upB} Ah]`;
+      document.getElementById('m2FocusRpi').textContent = `${activeCell.rpi_pct}%`;
+    }
+
+    ChartManager.renderM2Conformal('m2ConformalChart', nom_cap, activeCell, batch100);
 
     // 4. 多模型横向对照矩阵 (动态按当前体系阻抗与电压基准重新核算)
     const allM1 = CalculationEngine.compareAllM1Models(u0, rdc_dis, rdc_chg, drdc, eta, asym, relax, soc, chemKey);

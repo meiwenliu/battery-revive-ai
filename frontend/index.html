@@ -151,8 +151,7 @@
                 <option value="healthy_lfp">🔵 标定#2: LFP 在役 (SOH 89%)</option>
                 <option value="echelon_ncm">🟡 标定#4: NCM 轻载 (SOH 69%)</option>
                 <option value="dead_lfp">🔴 标定#5: LFP 失效 (SOH 54%)</option>
-                <option value="naion_proto">🟣 标定#6: 钠电试验 (SOH 88%)</option>
-                <option value="sic_aging">🔶 标定#7: 硅碳衰退 (SOH 78%)</option>
+                <option value="sic_aging">🔶 标定#6: 硅碳衰退 (SOH 78%)</option>
               </select>
             </div>
 
@@ -191,13 +190,12 @@
             </select>
           </div>
 
-          <!-- 材料体系选择 -->
+          <!-- 材料体系选择 (仅包含真实实验台架实测覆盖的三大体系) -->
           <div class="form-group" style="margin-bottom:8px;">
             <label class="form-label" style="color:var(--color-cyan); font-weight:700; font-size:11px;">🔬 材料体系</label>
             <select class="form-select" id="selBatteryChemistry">
               <option value="lfp" selected>磷酸铁锂 (LFP)</option>
               <option value="ncm">三元高镍 (NCM)</option>
-              <option value="naion">钠离子电池 (Na-ion)</option>
               <option value="sic">硅碳复合 (NCM-SiC)</option>
             </select>
           </div>
@@ -526,11 +524,20 @@
     <!-- ==================== Tab 4: 容量恢复与再生定级 (M2) ==================== -->
     <section class="tab-pane" id="tab-m2">
       <div class="card" style="margin-bottom:16px;">
-        <div class="card-header">
-          <div class="card-title"><span>🎯</span> 典型循环电芯恢复预测与 90% 保角区间</div>
-          <span class="card-title-badge">留一交叉验证 (90%置信覆盖)</span>
+        <div class="card-header" style="margin-bottom:8px;">
+          <div class="card-title"><span>🎯</span> 逐电芯容量恢复预测与 90% 保角置信区间 (柱状区间图)</div>
+          <span class="card-title-badge" id="m2ActiveCellBadge">当前选中电芯动态聚焦</span>
         </div>
-        <div class="chart-container" id="m2ConformalChart"></div>
+        <!-- 当前选中电芯高亮状态横幅 -->
+        <div id="m2CellFocusBanner" style="background:rgba(0, 229, 255, 0.05); border:1px solid rgba(0, 229, 255, 0.25); border-radius:6px; padding:8px 12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11.5px;">
+          <div><span>🎯 聚焦电芯：</span><strong id="m2FocusCellId" style="color:var(--color-brand); font-size:13px;">BAT-35Ah-01号</strong> <span id="m2FocusSoh" style="color:var(--text-secondary); margin-left:6px;">(SOH: 75.4%)</span></div>
+          <div style="display:flex; gap:14px; font-size:11.5px;">
+            <span>预估恢复量：<strong id="m2FocusQrec" style="color:var(--color-cyan); font-size:13px;">+0.1629 Ah</strong></span>
+            <span>90%保角区间：<strong id="m2FocusBound" style="color:var(--color-amber);">[0.10 ~ 0.22 Ah]</strong></span>
+            <span>恢复潜力：<strong id="m2FocusRpi" style="color:var(--color-green);">16.8%</strong></span>
+          </div>
+        </div>
+        <div class="chart-container" id="m2ConformalChart" style="height:320px;"></div>
       </div>
 
       <!-- 批量退役电芯 100 只矩阵快筛看板 (批量梯次分选专属) -->
@@ -881,7 +888,6 @@
               <option value="国轩高科 (Gotion)">国轩高科 (Gotion)</option>
               <option value="亿纬锂能 (EVE)">亿纬锂能 (EVE)</option>
               <option value="蜂巢能源 (SVOLT)">蜂巢能源 (SVOLT)</option>
-              <option value="中科海钠 (HiNa Na-ion)">中科海钠 (HiNa Na-ion)</option>
             </select>
           </div>
           <div class="form-group">

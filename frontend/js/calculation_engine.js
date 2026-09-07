@@ -178,45 +178,6 @@ const CalculationEngine = {
         { feature: "充电直流阻抗 R_dc,chg", score: 2.0, mechanism: "快充嵌锂相变阻抗" }
       ]
     },
-    naion: {
-      name: "钠离子电池 (Na-ion) 体系",
-      shortName: "Na-ion",
-      status: "ACTIVE",
-      statusText: "已标定在线",
-      statusColor: "var(--color-green)",
-      v_nominal: 3.10,
-      v_chg_cut: 4.00,
-      v_dis_cut: 1.80,
-      nominal_cap_ah: 30.0,
-      default_q_dis_ah: 23.70,
-      ef_mfg: 72.0, // kgCO2e/kWh 无锂无钴镍，极低碳属性
-      default_physics: {
-        u0: 3.1250,
-        rdc_dis: 0.0168,
-        rdc_chg: 0.0182,
-        drdc: -0.0034,
-        eta: -0.0340,
-        asym: -0.0680,
-        relax: 0.0760,
-        soc: 50.0,
-        ce: 0.9780,
-        ee: 0.8750
-      },
-      norm: {
-        u0_mean: 3.10, u0_std: 0.08,
-        rdis_mean: 0.016, rdis_std: 0.006,
-        rchg_mean: 0.015, rchg_std: 0.006
-      },
-      feature_importance: [
-        { feature: "撤载松弛电压 ΔU_relax", score: 31.2, mechanism: "硬碳微孔与石墨烯片层间大半径钠离子扩散迟滞" },
-        { feature: "充放电不对称度 A_sym", score: 24.8, mechanism: "脱钠与嵌钠过程活化能垒高度非对称性" },
-        { feature: "倍率敏感电阻差 ΔR_dc", score: 17.5, mechanism: "电解液中钠离子溶剂化与去溶剂化传质阻抗" },
-        { feature: "稳态开路电压 U₀", score: 12.6, mechanism: "斜坡区与平台区转变台阶电压与可用钠量" },
-        { feature: "持续极化过电位 η", score: 8.4, mechanism: "硬碳表面缺陷活性吸附点位反应过电位" },
-        { feature: "放电直流阻抗 R_dc,dis", score: 3.5, mechanism: "正极层状氧化物脱钠电荷转移阻抗" },
-        { feature: "充电直流阻抗 R_dc,chg", score: 2.0, mechanism: "低电位平台嵌钠阻抗" }
-      ]
-    },
     sic: {
       name: "硅碳复合体系 (NCM-SiC)",
       shortName: "NCM-SiC",
@@ -375,32 +336,9 @@ const CalculationEngine = {
       ee: 0.8200,
       ef_mfg: 105.0
     },
-    naion_proto: {
-      id: "Na-30Ah-钠电试制",
-      name: "🟣 [实测#6] 钠离子电池 (Na-ion) 试验电芯 (实测 SOH≈82%, B级调理再生)",
-      source_desc: "层状氧化物/硬碳体系钠电样机 500 次循环脉冲实测",
-      badge_text: "钠电样机标定",
-      chem: "naion",
-      nom_cap: 30.0,
-      v_nom: 3.10,
-      v_chg_cut: 4.00,
-      v_dis_cut: 1.50,
-      q_dis: 24.60,
-      u0: 3.1250,
-      rdc_dis: 0.0168,
-      rdc_chg: 0.0182,
-      drdc: -0.0034,
-      eta: -0.0340,
-      asym: -0.0680,
-      relax: 0.0760,
-      soc: 50.0,
-      ce: 0.9780,
-      ee: 0.8750,
-      ef_mfg: 72.0
-    },
     sic_aging: {
       id: "SiC-60Ah-硅碳退役",
-      name: "🔶 [实测#7] 硅碳复合 (NCM-SiC) 循环衰退电芯 (1200次循环, SOH≈78%, 推荐调理)",
+      name: "🔶 [实测#6] 硅碳复合 (NCM-SiC) 循环衰退电芯 (1200次循环, SOH≈78%, 推荐调理)",
       source_desc: "高能量密度硅碳软包电芯长循环台架脉冲数据 (1200次循环)",
       badge_text: "硅碳退役调理",
       chem: "sic",
@@ -435,8 +373,8 @@ const CalculationEngine = {
     const cap_ratio = Math.max(0.35, Math.min(1.05, qd / nom));
 
     // 2. 微观电化学阻抗劣化因子 (不同材料体系分别设定未劣化与严重失效阻抗边界)
-    const r_pristine = chemKey === 'lfp' ? 0.0100 : (chemKey === 'ncm' ? 0.0065 : (chemKey === 'naion' ? 0.0140 : 0.0080));
-    const r_fail = chemKey === 'lfp' ? 0.0240 : (chemKey === 'ncm' ? 0.0180 : (chemKey === 'naion' ? 0.0300 : 0.0200));
+    const r_pristine = chemKey === 'lfp' ? 0.0100 : (chemKey === 'ncm' ? 0.0065 : 0.0080);
+    const r_fail = chemKey === 'lfp' ? 0.0240 : (chemKey === 'ncm' ? 0.0180 : 0.0200);
     const r_penalty = Math.max(0.0, Math.min(1.0, (rdc_dis - r_pristine) / (r_fail - r_pristine)));
 
     // 3. 稳态开路电压与极化偏移量
@@ -608,7 +546,7 @@ const CalculationEngine = {
         tier: "D 级：材料级定向拆解与提锂前驱体再生",
         tier_code: "CLASS_D",
         color: "#EF4444",
-        scene: "正规湿法冶金回收生产线 / 电池多材料定向提锂与前驱体再生 (锂/镍/钴/钠盐等)",
+        scene: "正规湿法冶金回收生产线 / 电池多材料定向提锂与前驱体再生 (锂/镍/钴/锰盐等)",
         treatment: "不建议投入二次服役，直接进入带电破碎与湿法提锂闭环回收链路",
         economic_value: "材料回收价值 (按碳酸锂当期市价结算)",
         radar: { "容量保持度": 45.0, "反应过程对称性": 42.0, "副反应抑制性": 75.0, "容量可恢复潜力": 22.0, "低碳环境效益": 48.0 }
@@ -701,6 +639,8 @@ const CalculationEngine = {
         nom_cap_ah: nom_cap,
         v_nom: v_nom,
         q_rec_ah: rec.predicted_qrec_ah,
+        lower_90_ah: rec.lower_90_ah,
+        upper_90_ah: rec.upper_90_ah,
         rpi_pct: rec.rpi_pct,
         after_soh_pct: rec.predicted_after_soh_pct,
         tier_code: ech.tier_code,
